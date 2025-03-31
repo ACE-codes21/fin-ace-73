@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { AlertCircle, CheckCircle2, ArrowRight, Shield, BarChart3, Pie, Target } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowRight, Shield, BarChart3, PieChart, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Question {
@@ -129,7 +128,7 @@ const RISK_PROFILES = {
       "Multi-asset funds that include equity, debt, and gold",
       "Government securities and high-quality corporate bonds"
     ],
-    icon: Pie,
+    icon: PieChart,
   },
   MODERATE: {
     title: "Moderate Investor",
@@ -172,7 +171,6 @@ const RISK_PROFILES = {
   },
 };
 
-// Helper function to determine risk profile
 const getRiskProfile = (score: number) => {
   if (score <= 14) return RISK_PROFILES.CONSERVATIVE;
   if (score <= 19) return RISK_PROFILES.MODERATE_CONSERVATIVE;
@@ -349,13 +347,12 @@ const RiskAssessment = () => {
                             </div>
                             <Progress 
                               value={percentage} 
-                              className="h-2" 
-                              indicatorClassName={
-                                asset === 'equity' ? 'bg-finance-primary' :
-                                asset === 'debt' ? 'bg-finance-secondary' :
-                                asset === 'gold' ? 'bg-amber-400' :
-                                asset === 'alternatives' ? 'bg-finance-accent' :
-                                'bg-gray-400'
+                              className={
+                                asset === 'equity' ? 'h-2 bg-secondary [&>div]:bg-finance-primary' :
+                                asset === 'debt' ? 'h-2 bg-secondary [&>div]:bg-finance-secondary' :
+                                asset === 'gold' ? 'h-2 bg-secondary [&>div]:bg-amber-400' :
+                                asset === 'alternatives' ? 'h-2 bg-secondary [&>div]:bg-finance-accent' :
+                                'h-2 bg-secondary [&>div]:bg-gray-400'
                               }
                             />
                           </div>

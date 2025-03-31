@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Send, User, Bot, Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Tooltip,
   TooltipContent,
@@ -33,6 +34,10 @@ const Chat = () => {
   const [isAITyping, setIsAITyping] = useState(false);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('openai_api_key') || '');
   const [showApiKeyInput, setShowApiKeyInput] = useState(!localStorage.getItem('openai_api_key'));
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
+  const retryDelay = 2000; // 2 seconds
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -44,6 +49,17 @@ const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Reset rate limit status after 60 seconds
+  useEffect(() => {
+    if (isRateLimited) {
+      const timer = setTimeout(() => {
+        setIsRateLimited(false);
+      }, 60000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isRateLimited]);
 
   const saveApiKey = () => {
     if (apiKey.trim()) {
@@ -62,7 +78,7 @@ const Chat = () => {
     }
   };
 
-  const getAIResponse = async (userMessage: string): Promise<string> => {
+  const getAIResponse = async (userMessage: string, retry = 0): Promise<string> => {
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -87,10 +103,34 @@ const Chat = () => {
         })
       });
 
+      // Handle rate limiting specifically
+      if (response.status === 429) {
+        setIsRateLimited(true);
+        console.log(`Rate limited. Retry attempt: ${retry}`);
+        
+        if (retry < maxRetries) {
+          // Wait and retry with exponential backoff
+          await new Promise(resolve => setTimeout(resolve, retryDelay * Math.pow(2, retry)));
+          return getAIResponse(userMessage, retry + 1);
+        } else {
+          return "I'm currently experiencing high demand and have hit rate limits. Please try again in a minute or two.";
+        }
+      }
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error('API Error:', errorData);
-        return `I'm having trouble connecting to my knowledge base. Error: ${response.status}. Please try again later or check your API key.`;
+        
+        // Provide more specific error messages based on status code
+        if (response.status === 401) {
+          return "Authentication error. Please check your API key.";
+        } else if (response.status === 400) {
+          return "There was an issue with the request. Please try a different question.";
+        } else if (response.status >= 500) {
+          return "OpenAI's servers are currently experiencing issues. Please try again later.";
+        }
+        
+        return `I'm having trouble connecting to my knowledge base. Error: ${response.status}. Please try again later.`;
       }
 
       const data = await response.json();
@@ -108,6 +148,16 @@ const Chat = () => {
       toast({
         title: "API Key Required",
         description: "Please enter your OpenAI API key to continue",
+      });
+      return;
+    }
+    
+    // Check if rate limited
+    if (isRateLimited) {
+      toast({
+        title: "Rate Limit Exceeded",
+        description: "Please wait a minute before sending another message.",
+        variant: "destructive",
       });
       return;
     }
@@ -181,6 +231,15 @@ const Chat = () => {
               </Tooltip>
             </TooltipProvider>
           </div>
+          
+          {isRateLimited && (
+            <Alert className="mb-4">
+              <AlertTitle>Rate Limit Exceeded</AlertTitle>
+              <AlertDescription>
+                You've hit OpenAI's rate limit. Please wait a minute before sending another message.
+              </AlertDescription>
+            </Alert>
+          )}
           
           {showApiKeyInput ? (
             <Card className="mb-4 border border-gray-200">
@@ -275,11 +334,12 @@ const Chat = () => {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyDown}
                   className="flex-grow input-field"
+                  disabled={isRateLimited || isAITyping}
                 />
                 <Button 
                   onClick={handleSendMessage} 
                   className="bg-finance-primary hover:bg-finance-primary/90"
-                  disabled={inputMessage.trim() === '' || isAITyping}
+                  disabled={inputMessage.trim() === '' || isAITyping || isRateLimited}
                 >
                   <Send className="h-5 w-5" />
                 </Button>
@@ -293,3 +353,4 @@ const Chat = () => {
 };
 
 export default Chat;
+

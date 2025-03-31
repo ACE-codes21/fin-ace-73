@@ -5,32 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, User, Bot, Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { useToast } from "@/components/ui/use-toast";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-// This would normally come from your backend or API
-const getAIResponse = (message: string) => {
-  // For demo purposes, we'll return predefined responses based on keywords
-  const lowerMessage = message.toLowerCase();
-  
-  if (lowerMessage.includes('mutual fund') || lowerMessage.includes('funds')) {
-    return "Mutual funds are a popular investment option in India. They pool money from multiple investors to invest in stocks, bonds, or other assets. For beginners, index funds like those tracking Nifty 50 or Sensex are good starting points with lower fees. Look for funds with consistent performance over 5+ years and reasonable expense ratios.";
-  } else if (lowerMessage.includes('stock') || lowerMessage.includes('shares')) {
-    return "When investing in Indian stocks, consider starting with blue-chip companies listed on NSE or BSE. Diversify across sectors like IT, banking, consumer goods, and pharmaceuticals. Research companies' financial health, management quality, and growth prospects before investing. For beginners, systematic investment through SIPs might be less risky than lump-sum investments.";
-  } else if (lowerMessage.includes('crypto') || lowerMessage.includes('bitcoin')) {
-    return "Cryptocurrency investments in India exist in a regulatory gray area. While not illegal, they come with significant risks including high volatility and potential regulatory changes. If considering crypto, only invest what you can afford to lose, and consider it as a small portion (5% or less) of your overall portfolio. Make sure to use reputable exchanges that follow KYC procedures.";
-  } else if (lowerMessage.includes('tax') || lowerMessage.includes('taxes')) {
-    return "In India, different investments have different tax implications. Equity investments held for over a year have LTCG tax of 10% for gains above ₹1 lakh. Debt mutual funds are now taxed at your income tax slab rate regardless of holding period. ELSS funds offer tax deductions under Section 80C up to ₹1.5 lakh. Consider consulting a tax advisor for your specific situation.";
-  } else if (lowerMessage.includes('retirement') || lowerMessage.includes('pension')) {
-    return "For retirement planning in India, consider a mix of EPF/PPF, NPS, and equity mutual funds. The National Pension System (NPS) offers tax benefits and portfolio diversification. Aim to save at least 15% of your income for retirement. Your retirement corpus should ideally be 25-30 times your annual expenses at retirement age.";
-  } else {
-    return "Thanks for your question about Indian financial markets. To provide you with more accurate guidance, could you specify which investment type you're interested in learning about? I can help with mutual funds, stocks, tax planning, retirement planning, or general investment strategies tailored to Indian markets.";
-  }
-};
 
 interface Message {
   id: number;
@@ -44,14 +25,17 @@ const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hello! I'm your AI financial assistant. How can I help you with your investment or financial planning questions today? I'm specialized in Indian financial markets.",
+      text: "Hello! I'm your AI financial advisor. How can I help you with investment or financial planning in Indian markets today?",
       sender: 'ai',
       timestamp: new Date(),
     },
   ]);
   const [isAITyping, setIsAITyping] = useState(false);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('openai_api_key') || '');
+  const [showApiKeyInput, setShowApiKeyInput] = useState(!localStorage.getItem('openai_api_key'));
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -61,8 +45,72 @@ const Chat = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
+  const saveApiKey = () => {
+    if (apiKey.trim()) {
+      localStorage.setItem('openai_api_key', apiKey);
+      setShowApiKeyInput(false);
+      toast({
+        title: "API Key Saved",
+        description: "Your OpenAI API key has been saved to your browser's local storage.",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Please enter a valid API key",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getAIResponse = async (userMessage: string): Promise<string> => {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert financial advisor specializing in Indian financial markets. Provide detailed, accurate advice about investments, tax planning, and wealth management specifically for the Indian context. Include specific information about Indian financial products, regulations, and market conditions when relevant. Be thorough but concise.'
+            },
+            {
+              role: 'user',
+              content: userMessage
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 800
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        return `I'm having trouble connecting to my knowledge base. Error: ${response.status}. Please try again later or check your API key.`;
+      }
+
+      const data = await response.json();
+      return data.choices[0].message.content;
+    } catch (error) {
+      console.error('Error fetching AI response:', error);
+      return "I'm having trouble connecting to my knowledge base right now. Please try again later.";
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (inputMessage.trim() === '') return;
+    if (!apiKey && !showApiKeyInput) {
+      setShowApiKeyInput(true);
+      toast({
+        title: "API Key Required",
+        description: "Please enter your OpenAI API key to continue",
+      });
+      return;
+    }
     
     // Add user message
     const userMessage: Message = {
@@ -76,23 +124,41 @@ const Chat = () => {
     setInputMessage('');
     setIsAITyping(true);
     
-    // Simulate AI response with delay for natural feeling
-    setTimeout(() => {
+    // Get real AI response
+    try {
+      const aiResponseText = await getAIResponse(inputMessage);
+      
       const aiResponse: Message = {
         id: messages.length + 2,
-        text: getAIResponse(inputMessage),
+        text: aiResponseText,
         sender: 'ai',
         timestamp: new Date(),
       };
       
       setMessages(prevMessages => [...prevMessages, aiResponse]);
+    } catch (error) {
+      console.error('Error in AI response:', error);
+      
+      const errorResponse: Message = {
+        id: messages.length + 2,
+        text: "I'm sorry, I encountered an error while processing your request. Please try again later.",
+        sender: 'ai',
+        timestamp: new Date(),
+      };
+      
+      setMessages(prevMessages => [...prevMessages, errorResponse]);
+    } finally {
       setIsAITyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSendMessage();
+      if (showApiKeyInput) {
+        saveApiKey();
+      } else {
+        handleSendMessage();
+      }
     }
   };
 
@@ -116,80 +182,110 @@ const Chat = () => {
             </TooltipProvider>
           </div>
           
-          <Card className="mb-4 border border-gray-200">
-            <CardContent className="p-0">
-              <div className="h-[600px] overflow-y-auto p-4">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex mb-4 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          {showApiKeyInput ? (
+            <Card className="mb-4 border border-gray-200">
+              <CardContent className="p-6">
+                <h2 className="text-lg font-semibold mb-4">Enter Your OpenAI API Key</h2>
+                <p className="text-gray-600 mb-4">
+                  To access expert financial AI advice, please enter your OpenAI API key. 
+                  This key will be stored locally in your browser and is only used to make requests to OpenAI.
+                </p>
+                <div className="flex space-x-2">
+                  <Input
+                    type="password"
+                    placeholder="sk-..."
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="flex-grow input-field"
+                  />
+                  <Button 
+                    onClick={saveApiKey} 
+                    className="bg-finance-primary hover:bg-finance-primary/90"
                   >
-                    <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
-                      <div className={`flex items-center justify-center h-8 w-8 rounded-full flex-shrink-0 ${
-                        message.sender === 'user' 
-                          ? 'bg-finance-primary ml-2' 
-                          : 'bg-finance-accent mr-2'
-                      }`}>
-                        {message.sender === 'user' ? (
-                          <User className="h-4 w-4 text-white" />
-                        ) : (
-                          <Bot className="h-4 w-4 text-white" />
-                        )}
-                      </div>
+                    Save Key
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <Card className="mb-4 border border-gray-200">
+                <CardContent className="p-0">
+                  <div className="h-[600px] overflow-y-auto p-4">
+                    {messages.map((message) => (
                       <div
-                        className={`p-3 rounded-lg ${
-                          message.sender === 'user'
-                            ? 'bg-finance-primary text-white'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
+                        key={message.id}
+                        className={`flex mb-4 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
-                        <p>{message.text}</p>
-                        <div className={`text-xs mt-1 ${
-                          message.sender === 'user' ? 'text-finance-primary-foreground/70' : 'text-gray-500'
-                        }`}>
-                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <div className={`flex max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
+                          <div className={`flex items-center justify-center h-8 w-8 rounded-full flex-shrink-0 ${
+                            message.sender === 'user' 
+                              ? 'bg-finance-primary ml-2' 
+                              : 'bg-finance-accent mr-2'
+                          }`}>
+                            {message.sender === 'user' ? (
+                              <User className="h-4 w-4 text-white" />
+                            ) : (
+                              <Bot className="h-4 w-4 text-white" />
+                            )}
+                          </div>
+                          <div
+                            className={`p-3 rounded-lg ${
+                              message.sender === 'user'
+                                ? 'bg-finance-primary text-white'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            <p style={{ whiteSpace: 'pre-wrap' }}>{message.text}</p>
+                            <div className={`text-xs mt-1 ${
+                              message.sender === 'user' ? 'text-finance-primary-foreground/70' : 'text-gray-500'
+                            }`}>
+                              {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
-                {isAITyping && (
-                  <div className="flex mb-4 justify-start">
-                    <div className="flex">
-                      <div className="flex items-center justify-center h-8 w-8 rounded-full bg-finance-accent mr-2">
-                        <Bot className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="p-3 rounded-lg bg-gray-100 text-gray-800">
-                        <div className="flex space-x-1">
-                          <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse"></div>
-                          <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse delay-75"></div>
-                          <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
+                    ))}
+                    {isAITyping && (
+                      <div className="flex mb-4 justify-start">
+                        <div className="flex">
+                          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-finance-accent mr-2">
+                            <Bot className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="p-3 rounded-lg bg-gray-100 text-gray-800">
+                            <div className="flex space-x-1">
+                              <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse"></div>
+                              <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse delay-75"></div>
+                              <div className="h-2 w-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
+                    <div ref={messagesEndRef} />
                   </div>
-                )}
-                <div ref={messagesEndRef} />
+                </CardContent>
+              </Card>
+              
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="Ask me about investing in the Indian market..."
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="flex-grow input-field"
+                />
+                <Button 
+                  onClick={handleSendMessage} 
+                  className="bg-finance-primary hover:bg-finance-primary/90"
+                  disabled={inputMessage.trim() === '' || isAITyping}
+                >
+                  <Send className="h-5 w-5" />
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-          
-          <div className="flex space-x-2">
-            <Input
-              placeholder="Ask me about investing in the Indian market..."
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-grow input-field"
-            />
-            <Button 
-              onClick={handleSendMessage} 
-              className="bg-finance-primary hover:bg-finance-primary/90"
-              disabled={inputMessage.trim() === '' || isAITyping}
-            >
-              <Send className="h-5 w-5" />
-            </Button>
-          </div>
+            </>
+          )}
         </div>
       </div>
     </Layout>

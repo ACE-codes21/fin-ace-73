@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
@@ -36,6 +35,7 @@ const Chat = () => {
   const [showApiKeyInput, setShowApiKeyInput] = useState(!localStorage.getItem('openai_api_key'));
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const maxRetries = 3;
   const retryDelay = 2000; // 2 seconds
   
@@ -50,7 +50,6 @@ const Chat = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Reset rate limit status after 60 seconds
   useEffect(() => {
     if (isRateLimited) {
       const timer = setTimeout(() => {
@@ -87,7 +86,7 @@ const Chat = () => {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
@@ -103,41 +102,30 @@ const Chat = () => {
         })
       });
 
-      // Handle rate limiting specifically
-      if (response.status === 429) {
+      if (response.status === 429 || response.status === 403) {
         setIsRateLimited(true);
-        console.log(`Rate limited. Retry attempt: ${retry}`);
+        setApiKeyError("Your OpenAI API key has reached its usage limit. Please check your account or try a different key.");
         
-        if (retry < maxRetries) {
-          // Wait and retry with exponential backoff
-          await new Promise(resolve => setTimeout(resolve, retryDelay * Math.pow(2, retry)));
-          return getAIResponse(userMessage, retry + 1);
-        } else {
-          return "I'm currently experiencing high demand and have hit rate limits. Please try again in a minute or two.";
-        }
+        return "I'm currently experiencing high demand. Please verify your OpenAI API key or wait before trying again.";
       }
 
       if (!response.ok) {
         const errorData = await response.json();
         console.error('API Error:', errorData);
         
-        // Provide more specific error messages based on status code
         if (response.status === 401) {
-          return "Authentication error. Please check your API key.";
-        } else if (response.status === 400) {
-          return "There was an issue with the request. Please try a different question.";
-        } else if (response.status >= 500) {
-          return "OpenAI's servers are currently experiencing issues. Please try again later.";
+          setApiKeyError("Invalid API key. Please check and re-enter your OpenAI API key.");
+          return "Authentication failed. Please verify your API key.";
         }
         
-        return `I'm having trouble connecting to my knowledge base. Error: ${response.status}. Please try again later.`;
+        return `Connection error. Status: ${response.status}. Please try again later.`;
       }
 
       const data = await response.json();
       return data.choices[0].message.content;
     } catch (error) {
-      console.error('Error fetching AI response:', error);
-      return "I'm having trouble connecting to my knowledge base right now. Please try again later.";
+      console.error('Unexpected error:', error);
+      return "An unexpected error occurred. Please try again later.";
     }
   };
 
@@ -152,7 +140,6 @@ const Chat = () => {
       return;
     }
     
-    // Check if rate limited
     if (isRateLimited) {
       toast({
         title: "Rate Limit Exceeded",
@@ -162,7 +149,6 @@ const Chat = () => {
       return;
     }
     
-    // Add user message
     const userMessage: Message = {
       id: messages.length + 1,
       text: inputMessage,
@@ -174,7 +160,6 @@ const Chat = () => {
     setInputMessage('');
     setIsAITyping(true);
     
-    // Get real AI response
     try {
       const aiResponseText = await getAIResponse(inputMessage);
       
@@ -353,4 +338,3 @@ const Chat = () => {
 };
 
 export default Chat;
-

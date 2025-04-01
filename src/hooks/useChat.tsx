@@ -1,106 +1,179 @@
 
-import { useState } from 'react';
-import { useToast } from "@/hooks/use-toast";
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { callOpenAI, OpenAIErrorResponse } from '@/utils/openai';
+import { generateGeminiResponse, GeminiErrorResponse } from '@/utils/gemini';
 
 export interface Message {
   id: number;
   text: string;
   sender: 'user' | 'ai';
   timestamp: Date;
+  feedbackSubmitted?: boolean;
 }
 
-export const useChat = () => {
-  const [inputMessage, setInputMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "Hello! I'm your FinAce AI financial advisor. How can I help you with investment or financial planning in Indian markets today?",
-      sender: 'ai',
-      timestamp: new Date(),
-    },
-  ]);
-  const [isAITyping, setIsAITyping] = useState(false);
-  const { toast } = useToast();
+interface UseChatProps {
+  apiKey: string;
+  geminiApiKey: string;
+  selectedModel: 'openai' | 'gemini';
+}
 
-  const sendMessage = async (userMessage: string = inputMessage) => {
-    if (userMessage.trim() === '') return { success: false };
-    
-    // Record user message
-    const newUserMessage: Message = {
-      id: messages.length + 1,
-      text: userMessage,
-      sender: 'user',
-      timestamp: new Date(),
-    };
-    
-    setMessages(prevMessages => [...prevMessages, newUserMessage]);
-    setInputMessage('');
+export const useChat = ({ apiKey, geminiApiKey, selectedModel }: UseChatProps) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isAITyping, setIsAITyping] = useState(false);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [apiKeyError, setApiKeyError] = useState<OpenAIErrorResponse | GeminiErrorResponse | null>(null);
+  
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const currentMessageId = useRef(0);
+
+  const getNextMessageId = () => {
+    currentMessageId.current += 1;
+    return currentMessageId.current;
+  };
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  const handleScroll = () => {
+    // Custom scroll handler can be implemented if needed
+  };
+
+  const generateResponse = async (userMessage: string) => {
     setIsAITyping(true);
+    setErrorMessage(null);
+    setApiKeyError(null);
     
     try {
-      // Simulate AI response after a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (selectedModel === 'gemini' && geminiApiKey) {
+        const response = await generateGeminiResponse(geminiApiKey, userMessage);
+        
+        if (response.error) {
+          console.error("Gemini API Error:", response.error);
+          setApiKeyError(response.error);
+          setErrorMessage(response.error.message);
+          return null;
+        }
+        
+        return response.text || "Sorry, I couldn't generate a response.";
+      } else if (selectedModel === 'openai' && apiKey) {
+        const response = await callOpenAI({
+          apiKey,
+          messages: [...messages.map(msg => ({
+            role: msg.sender === 'user' ? 'user' : 'assistant',
+            content: msg.text
+          })), {
+            role: 'user',
+            content: userMessage
+          }]
+        });
+        
+        if (response.error) {
+          console.error("OpenAI API Error:", response.error);
+          setApiKeyError(response.error);
+          setErrorMessage(response.error.message);
+          
+          if (response.error.status === 429) {
+            setIsRateLimited(true);
+            setTimeout(() => setIsRateLimited(false), 60000); // Reset after 1 minute
+          }
+          
+          return null;
+        }
+        
+        return response.message;
+      }
       
-      // Sample responses to common financial questions
-      const responses = [
-        "Based on current market trends in India, diversifying your portfolio across different asset classes would be advisable.",
-        "For tax planning in India, you might want to consider investments under Section 80C of the Income Tax Act.",
-        "The Indian mutual fund market offers several SIP options that could align with your risk profile.",
-        "Recent RBI policies suggest that interest rates may continue to fluctuate. Consider this when planning fixed deposits.",
-        "For retirement planning in India, a combination of EPF, PPF, and NPS could provide a balanced approach.",
-      ];
-      
-      // Select a random response
-      const aiResponse: Message = {
-        id: messages.length + 2,
-        text: responses[Math.floor(Math.random() * responses.length)],
-        sender: 'ai',
-        timestamp: new Date(),
-      };
-      
-      setMessages(prevMessages => [...prevMessages, aiResponse]);
-      return { success: true };
-      
+      // Demo mode with predefined responses if no API key
+      return "I'm FinAce, your financial assistant. To access my full capabilities, please provide a valid API key.";
     } catch (error) {
-      console.error('Error in AI response:', error);
-      
-      toast({
-        title: "AI Response Error",
-        description: "Could not generate an AI response. Please try again later.",
-        variant: "destructive",
-      });
-      
-      return { success: false };
+      console.error("Error generating response:", error);
+      setErrorMessage(error instanceof Error ? error.message : "An error occurred");
+      return null;
     } finally {
       setIsAITyping(false);
     }
   };
 
-  const handleFeedbackSubmit = (rating: number, feedback: string, messageId: number) => {
-    // Simple feedback logging
-    console.log("Feedback submitted:", { messageId, rating, feedback });
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     
-    // Mark message as having feedback submitted
-    setMessages(prevMessages => 
-      prevMessages.map(msg => 
-        msg.id === messageId ? { ...msg, feedbackSubmitted: true } : msg
+    if (!inputMessage.trim() || isAITyping || isRateLimited) {
+      return;
+    }
+    
+    const userMessage = inputMessage.trim();
+    setInputMessage('');
+    
+    // Add user message to chat
+    const newUserMessage: Message = {
+      id: getNextMessageId(),
+      text: userMessage,
+      sender: 'user',
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, newUserMessage]);
+    
+    // Generate and add AI response
+    const aiResponse = await generateResponse(userMessage);
+    
+    if (aiResponse) {
+      const newAIMessage: Message = {
+        id: getNextMessageId(),
+        text: aiResponse,
+        sender: 'ai',
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, newAIMessage]);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const onFeedbackSubmit = (rating: number, feedback: string, messageId: number) => {
+    // Update message to mark feedback as submitted
+    setMessages(prev => 
+      prev.map(message => 
+        message.id === messageId 
+          ? { ...message, feedbackSubmitted: true } 
+          : message
       )
     );
     
-    // Show toast confirmation
-    toast({
-      title: "Feedback Received",
-      description: "Thank you for your feedback!",
-    });
+    // In a real application, you would send this feedback to a server
+    console.log(`Feedback submitted for message ${messageId}: Rating ${rating}, Feedback: "${feedback}"`);
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   return {
     messages,
-    setMessages,
     inputMessage,
     setInputMessage,
     isAITyping,
-    sendMessage,
-    handleFeedbackSubmit,
+    isRateLimited,
+    errorMessage,
+    apiKeyError,
+    chatContainerRef,
+    messagesEndRef,
+    handleSendMessage,
+    handleKeyDown,
+    handleScroll,
+    onFeedbackSubmit
   };
 };

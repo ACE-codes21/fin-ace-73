@@ -132,44 +132,16 @@ export const useApiKeys = () => {
       setGeminiApiKey('');
       setShowApiKeyInput(true);
       toast({
-        title: "API Keys Removed",
-        description: "Your API keys have been removed from local storage.",
+        title: "API Key Cleared",
+        description: "Your API key has been removed from local storage.",
       });
-      return true;
     } catch (e) {
-      console.error("Error removing from localStorage:", e);
+      console.error("Error clearing localStorage:", e);
       toast({
         title: "Error",
-        description: "Could not remove API keys from local storage.",
+        description: "Could not clear API key from local storage.",
         variant: "destructive",
       });
-      return false;
-    }
-  };
-
-  const switchAIProvider = () => {
-    const newModel = selectedModel === 'openai' ? 'gemini' : 'openai';
-    setSelectedModel(newModel);
-    
-    try {
-      localStorage.setItem('ai_model', newModel);
-      
-      // Check if we need to show the API key input form
-      if (newModel === 'openai' && !apiKey) {
-        setShowApiKeyInput(true);
-      } else if (newModel === 'gemini' && !geminiApiKey) {
-        setShowApiKeyInput(true);
-      }
-      
-      toast({
-        title: `Switched to ${newModel === 'openai' ? 'OpenAI' : 'Gemini'} API`,
-        description: `You are now using the ${newModel === 'openai' ? 'OpenAI' : 'Gemini'} AI provider.`,
-      });
-      
-      return true;
-    } catch (e) {
-      console.error("Error saving model choice to localStorage:", e);
-      return false;
     }
   };
 
@@ -184,6 +156,5 @@ export const useApiKeys = () => {
     setShowApiKeyInput,
     saveApiKey,
     clearApiKey,
-    switchAIProvider,
   };
 };

@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Info, KeyIcon } from 'lucide-react';
-import { GeminiErrorResponse } from '@/utils/gemini';
+import { GeminiErrorResponse } from '@/types/chat';
 import { motion } from 'framer-motion';
 
 interface ApiKeyInputProps {

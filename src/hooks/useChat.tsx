@@ -1,20 +1,10 @@
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { generateGeminiResponse, GeminiErrorResponse } from '@/utils/gemini';
+import { useState, useRef, useEffect } from 'react';
 import { useChatScroll } from '@/hooks/useChatScroll';
 import { useToast } from "@/hooks/use-toast";
-
-// This is a hardcoded API key for demo purposes
-// In a real application, this would be stored on the server side
-const SERVER_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
-
-export interface Message {
-  id: number;
-  text: string;
-  sender: 'user' | 'ai';
-  timestamp: Date;
-  feedbackSubmitted?: boolean;
-}
+import { generateGeminiResponse } from '@/services/geminiService';
+import { useFeedback } from '@/hooks/useFeedback';
+import { Message, GeminiErrorResponse } from '@/types/chat';
 
 export const useChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -26,6 +16,7 @@ export const useChat = () => {
   const [hasScrolledUp, setHasScrolledUp] = useState(false);
   
   const { toast } = useToast();
+  const { handleFeedbackSubmit } = useFeedback();
   
   const { 
     chatContainerRef,
@@ -76,7 +67,7 @@ export const useChat = () => {
         content: userMessage
       }];
       
-      const response = await generateGeminiResponse(SERVER_API_KEY, fullMessageHistory);
+      const response = await generateGeminiResponse(fullMessageHistory);
       
       if (response.error) {
         console.error("Gemini API Error:", response.error);
@@ -161,8 +152,7 @@ export const useChat = () => {
     }
   };
 
-  const onFeedbackSubmit = (rating: number, feedback: string, messageId: number) => {
-    // Update message to mark feedback as submitted
+  const updateMessageWithFeedback = (messageId: number) => {
     setMessages(prev => 
       prev.map(message => 
         message.id === messageId 
@@ -170,14 +160,10 @@ export const useChat = () => {
           : message
       )
     );
-    
-    toast({
-      title: "Thank you for your feedback!",
-      description: rating > 3 ? "We're glad you found this response helpful." : "We'll work on improving our responses.",
-    });
-    
-    // In a real application, you would send this feedback to a server
-    console.log(`Feedback submitted for message ${messageId}: Rating ${rating}, Feedback: "${feedback}"`);
+  };
+
+  const onFeedbackSubmit = (rating: number, feedback: string, messageId: number) => {
+    handleFeedbackSubmit(rating, feedback, messageId, updateMessageWithFeedback);
   };
 
   return {

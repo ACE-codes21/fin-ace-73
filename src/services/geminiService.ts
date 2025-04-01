@@ -1,17 +1,11 @@
 
-export interface GeminiErrorResponse {
-  error: boolean;
-  message: string;
-  status?: number;
-}
+import { GeminiErrorResponse, GeminiResponse } from '@/types/chat';
 
-export interface GeminiResponse {
-  text?: string;
-  error?: GeminiErrorResponse;
-}
+// This is a hardcoded API key for demo purposes
+// In a real application, this would be stored on the server side
+const SERVER_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
 
 export async function generateGeminiResponse(
-  apiKey: string,
   messages: { role: string; content: string }[]
 ): Promise<GeminiResponse> {
   try {
@@ -30,7 +24,7 @@ export async function generateGeminiResponse(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": apiKey,
+          "x-goog-api-key": SERVER_API_KEY,
         },
         body: JSON.stringify({
           contents: [

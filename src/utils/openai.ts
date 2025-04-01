@@ -55,11 +55,25 @@ export async function fetchOpenAIResponse(
       // Handle rate limiting errors
       if (response.status === 429) {
         console.info('Rate limit exceeded, status:', response.status);
+        
+        // Check specifically for quota exceeded errors
+        if (errorData.error?.type === 'insufficient_quota') {
+          return {
+            text: '',
+            error: {
+              title: 'API Quota Exceeded',
+              message: 'Your OpenAI API quota has been exceeded. Please try switching to Gemini API.',
+              status: 429,
+              variant: 'rate-limit',
+            },
+          };
+        }
+        
         return {
           text: '',
           error: {
             title: 'Rate Limit Exceeded',
-            message: 'OpenAI\'s servers are experiencing high traffic. Please try again in a few minutes or use a different API key.',
+            message: 'OpenAI\'s servers are experiencing high traffic. Please try switching to Gemini API or wait a few minutes.',
             status: 429,
             variant: 'rate-limit',
           },
@@ -79,19 +93,6 @@ export async function fetchOpenAIResponse(
         };
       }
       
-      // Handle quota exceeded errors
-      if (response.status === 429 && errorData.error?.type === 'insufficient_quota') {
-        return {
-          text: '',
-          error: {
-            title: 'API Quota Exceeded',
-            message: 'Your OpenAI API quota has been exceeded. Please check your billing details or try a different API key.',
-            status: 429,
-            variant: 'rate-limit',
-          },
-        };
-      }
-
       // Generic error
       return {
         text: '',

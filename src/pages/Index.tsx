@@ -10,11 +10,13 @@ import CTASection from '@/components/home/CTASection';
 const Index = () => {
   return (
     <Layout>
-      <HeroSection />
-      <FeaturesSection />
-      <HowItWorksSection />
-      <StatsSection />
-      <CTASection />
+      <div className="animate-fade-in">
+        <HeroSection />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <StatsSection />
+        <CTASection />
+      </div>
     </Layout>
   );
 };

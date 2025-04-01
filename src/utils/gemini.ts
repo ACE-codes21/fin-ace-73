@@ -1,5 +1,5 @@
 
-import { Message } from "../pages/Chat";
+import { Message } from "../hooks/useChat";
 
 interface GeminiErrorResponse {
   title: string;
@@ -52,9 +52,6 @@ export const fetchGeminiResponse = async (
       parts: [{ text: userInput }]
     });
 
-    // Get system message if it exists
-    const systemMessage = messageHistory.find(msg => msg.sender === 'system');
-    
     // Create the request payload
     const requestBody: any = {
       contents: formattedMessages,
@@ -67,9 +64,11 @@ export const fetchGeminiResponse = async (
     };
 
     // Add system message if present (as system instructions in Gemini API)
+    const systemMessage = "You are an expert financial advisor specializing in Indian financial markets. Provide detailed, accurate advice about investments, tax planning, and wealth management specifically for the Indian context.";
+    
     if (systemMessage) {
       requestBody.systemInstruction = { 
-        parts: [{ text: systemMessage.text }] 
+        parts: [{ text: systemMessage }] 
       };
     }
 

@@ -12,12 +12,8 @@ import { useChat } from '@/hooks/useChat';
 
 const Chat = () => {
   const {
-    apiKey,
-    setApiKey,
     geminiApiKey,
     setGeminiApiKey,
-    selectedModel,
-    setSelectedModel,
     showApiKeyInput,
     saveApiKey,
     clearApiKey
@@ -38,9 +34,7 @@ const Chat = () => {
     handleScroll,
     onFeedbackSubmit
   } = useChat({
-    apiKey,
     geminiApiKey,
-    selectedModel,
   });
 
   return (
@@ -54,12 +48,8 @@ const Chat = () => {
           <ErrorBoundary>
             {showApiKeyInput && (
               <ApiKeyInput
-                apiKey={apiKey}
-                setApiKey={setApiKey}
                 geminiApiKey={geminiApiKey}
                 setGeminiApiKey={setGeminiApiKey}
-                selectedModel={selectedModel}
-                setSelectedModel={setSelectedModel}
                 saveApiKey={saveApiKey}
                 apiKeyError={apiKeyError}
               />
@@ -67,9 +57,9 @@ const Chat = () => {
 
             {errorMessage && (
               <ChatError
-                title={apiKeyError?.type === "insufficient_quota" ? "API Rate Limit Exceeded" : "Error"}
+                title={apiKeyError?.status === 429 ? "API Rate Limit Exceeded" : "Error"}
                 description={errorMessage}
-                variant={apiKeyError?.status === 429 ? "rate-limit" : apiKeyError?.type === "invalid_request_error" ? "auth" : "general"}
+                variant={apiKeyError?.status === 429 ? "rate-limit" : "general"}
               />
             )}
 

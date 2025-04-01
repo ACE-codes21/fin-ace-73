@@ -12,9 +12,18 @@ export interface GeminiResponse {
 
 export async function generateGeminiResponse(
   apiKey: string,
-  prompt: string
+  messages: { role: string; content: string }[]
 ): Promise<GeminiResponse> {
   try {
+    // Extract the user's current question (last message)
+    const userQuestion = messages.filter(msg => msg.role === 'user').pop()?.content || '';
+    
+    // Include chat history context for better continuity
+    const chatContext = messages
+      .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+      .join('\n\n')
+      .slice(-5000); // Limit context to avoid token limits
+    
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent",
       {
@@ -29,7 +38,7 @@ export async function generateGeminiResponse(
               role: "user", 
               parts: [
                 { 
-                  text: `You are a financial advisor specialized in Indian markets. Your name is FinAce, an AI financial assistant. Use your expertise to provide thorough, accurate, and personalized financial advice for Indian investors. Explain investment concepts clearly, analyze market trends relevant to India, and give tailored guidance based on the query. Always consider Indian tax laws, regulations, and investment options in your responses. Be conversational but professional. Here's the user's question: ${prompt}`
+                  text: `You are a financial advisor specialized in Indian markets. Your name is FinAce, an AI financial assistant. Use your expertise to provide thorough, accurate, and personalized financial advice for Indian investors. Explain investment concepts clearly, analyze market trends relevant to India, and give tailored guidance based on the query. Always consider Indian tax laws, regulations, and investment options in your responses. Be conversational but professional.\n\nChat history for context:\n${chatContext}\n\nCurrent question: ${userQuestion}`
                 }
               ]
             }

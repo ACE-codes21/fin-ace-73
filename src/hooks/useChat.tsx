@@ -1,6 +1,5 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { callOpenAI, OpenAIErrorResponse } from '@/utils/openai';
 import { generateGeminiResponse, GeminiErrorResponse } from '@/utils/gemini';
 
 export interface Message {
@@ -12,18 +11,16 @@ export interface Message {
 }
 
 interface UseChatProps {
-  apiKey: string;
   geminiApiKey: string;
-  selectedModel: 'openai' | 'gemini';
 }
 
-export const useChat = ({ apiKey, geminiApiKey, selectedModel }: UseChatProps) => {
+export const useChat = ({ geminiApiKey }: UseChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [apiKeyError, setApiKeyError] = useState<OpenAIErrorResponse | GeminiErrorResponse | null>(null);
+  const [apiKeyError, setApiKeyError] = useState<GeminiErrorResponse | null>(null);
   
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -48,48 +45,41 @@ export const useChat = ({ apiKey, geminiApiKey, selectedModel }: UseChatProps) =
     setErrorMessage(null);
     setApiKeyError(null);
     
+    if (!geminiApiKey) {
+      setErrorMessage("Please provide a valid Gemini API key to use FinAce.");
+      setIsAITyping(false);
+      return null;
+    }
+    
     try {
-      if (selectedModel === 'gemini' && geminiApiKey) {
-        const response = await generateGeminiResponse(geminiApiKey, userMessage);
+      // Convert messages to format expected by Gemini
+      const messageHistory = messages.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+      
+      // Add current user message
+      const fullMessageHistory = [...messageHistory, {
+        role: 'user',
+        content: userMessage
+      }];
+      
+      const response = await generateGeminiResponse(geminiApiKey, fullMessageHistory);
+      
+      if (response.error) {
+        console.error("Gemini API Error:", response.error);
+        setApiKeyError(response.error);
+        setErrorMessage(response.error.message);
         
-        if (response.error) {
-          console.error("Gemini API Error:", response.error);
-          setApiKeyError(response.error);
-          setErrorMessage(response.error.message);
-          return null;
+        if (response.error.status === 429) {
+          setIsRateLimited(true);
+          setTimeout(() => setIsRateLimited(false), 60000); // Reset after 1 minute
         }
         
-        return response.text || "Sorry, I couldn't generate a response.";
-      } else if (selectedModel === 'openai' && apiKey) {
-        const response = await callOpenAI({
-          apiKey,
-          messages: [...messages.map(msg => ({
-            role: msg.sender === 'user' ? 'user' : 'assistant',
-            content: msg.text
-          })), {
-            role: 'user',
-            content: userMessage
-          }]
-        });
-        
-        if (response.error) {
-          console.error("OpenAI API Error:", response.error);
-          setApiKeyError(response.error);
-          setErrorMessage(response.error.message);
-          
-          if (response.error.status === 429) {
-            setIsRateLimited(true);
-            setTimeout(() => setIsRateLimited(false), 60000); // Reset after 1 minute
-          }
-          
-          return null;
-        }
-        
-        return response.message;
+        return null;
       }
       
-      // Demo mode with predefined responses if no API key
-      return "I'm FinAce, your financial assistant. To access my full capabilities, please provide a valid API key.";
+      return response.text;
     } catch (error) {
       console.error("Error generating response:", error);
       setErrorMessage(error instanceof Error ? error.message : "An error occurred");

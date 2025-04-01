@@ -65,15 +65,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Clear Chat</p>
+              <p>Clear API Key & Chat</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </form>
-      
-      <div className="text-xs text-gray-500 text-center mt-2">
-        Demo chatbot with pre-programmed responses
-      </div>
     </div>
   );
 };

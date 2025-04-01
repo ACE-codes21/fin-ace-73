@@ -5,11 +5,10 @@ import remarkGfm from 'remark-gfm';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, User, Bot, Info, XCircle, Loader2, RefreshCcw, Lock, Shield, Server, Clock } from 'lucide-react';
+import { Send, User, Bot, Info, XCircle, Loader2, RefreshCcw, Server, Clock } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from "@/hooks/use-toast";
 import { ChatError } from "@/components/chat/ChatError";
-import { SecurityInfo } from "@/components/chat/SecurityInfo";
 import { FeedbackRating } from "@/components/chat/FeedbackRating";
 import { RealTimeMarketData } from "@/components/market/RealTimeMarketData";
 import {
@@ -70,21 +69,35 @@ const Chat = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const scrollToBottom = () => {
+  // Improved scroll function that won't automatically scroll to bottom on every message
+  const scrollToBottom = (force: boolean = false) => {
     try {
-      // Use requestAnimationFrame to ensure we scroll after the DOM has updated
-      requestAnimationFrame(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      // Only auto-scroll if we're near the bottom already or if forced
+      if (messagesEndRef.current && chatContainerRef.current) {
+        const container = chatContainerRef.current;
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 200;
+        
+        if (isNearBottom || force || messages[messages.length - 1]?.sender === 'user') {
+          // Use setTimeout to ensure DOM has updated
+          setTimeout(() => {
+            if (messagesEndRef.current) {
+              messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+          }, 100);
         }
-      });
+      }
     } catch (e) {
       console.error("Error scrolling to bottom:", e);
     }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    // Only auto-scroll when a new message is added
+    if (messages.length > 0) {
+      // Auto-scroll when the user sends a message, but be smarter about AI responses
+      const lastMessage = messages[messages.length - 1];
+      scrollToBottom(lastMessage.sender === 'user');
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -354,7 +367,7 @@ const Chat = () => {
                 <Card className="mb-4 border border-gray-200 animate-fade-in shadow-md">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <Lock className="h-5 w-5 mr-2 text-finance-primary" />
+                      <Info className="h-5 w-5 mr-2 text-finance-primary" />
                       <h2 className="text-lg font-semibold text-finance-primary">Enter Your OpenAI API Key</h2>
                     </div>
                     
@@ -372,7 +385,6 @@ const Chat = () => {
                           onChange={(e) => setApiKey(e.target.value)}
                           className="pr-10 border-finance-primary/20 focus:border-finance-primary focus:ring-2 focus:ring-finance-primary/20"
                         />
-                        <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       </div>
                       <Button 
                         type="submit"
@@ -385,14 +397,12 @@ const Chat = () => {
                     {apiKeyError && (
                       <p className="mt-2 text-sm text-red-500">{apiKeyError.message}</p>
                     )}
-                    
-                    <SecurityInfo />
                   </CardContent>
                 </Card>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    <div className="lg:col-span-3">
+                  <div className="grid grid-cols-1 gap-6">
+                    <div>
                       <Card className="mb-4 border border-gray-200 shadow-md overflow-hidden">
                         <CardContent className="p-0">
                           <div 
@@ -528,21 +538,6 @@ const Chat = () => {
                           </TooltipProvider>
                         </form>
                       </div>
-                    </div>
-                    
-                    <div className="lg:col-span-1 space-y-6">
-                      <SecurityInfo />
-                      <Card className="border rounded-lg shadow-sm overflow-hidden">
-                        <CardContent className="p-4">
-                          <div className="flex items-center mb-3">
-                            <Clock className="h-5 w-5 mr-2 text-amber-500" />
-                            <h3 className="font-semibold">Coming Soon</h3>
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            The Finance Quests feature has been temporarily removed and will return in a future update with improved functionality.
-                          </p>
-                        </CardContent>
-                      </Card>
                     </div>
                   </div>
                 </>

@@ -4,119 +4,94 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-50 border-t border-gray-100 mt-20">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-finance-primary via-finance-accent to-finance-secondary rounded-md flex items-center justify-center text-white font-bold shadow-md">
-                FA
-              </div>
-              <span className="font-bold text-xl">FinAce</span>
-            </div>
-            <p className="mt-4 text-gray-600 text-sm">
-              AI-powered financial guidance to help you make smarter investment decisions.
+    <footer className="bg-gray-900 text-white pt-12 pb-8">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold">FinAce</h3>
+            <p className="text-gray-300 text-sm">
+              Your AI-powered financial advisor for Indian markets. Make smarter investment decisions with data-driven insights.
             </p>
+            <div className="flex space-x-4">
+              <Link to="/social/twitter" className="text-gray-300 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                </svg>
+              </Link>
+              <Link to="/social/linkedin" className="text-gray-300 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect width="4" height="12" x="2" y="9"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </Link>
+              <Link to="/social/github" className="text-gray-300 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                  <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+                  <path d="M9 18c-4.51 2-5-2-7-2"></path>
+                </svg>
+              </Link>
+            </div>
           </div>
           
           <div>
-            <h3 className="font-medium text-gray-900 mb-4">Features</h3>
-            <ul className="space-y-3">
+            <h3 className="text-lg font-bold mb-4">Features</h3>
+            <ul className="space-y-2">
               <li>
-                <Link to="/forecast" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  Financial Forecasting
-                </Link>
+                <Link to="/chat" className="text-gray-300 hover:text-white transition-colors">AI Advisor</Link>
               </li>
               <li>
-                <Link to="/risk-assessment" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  Risk Assessment
-                </Link>
+                <Link to="/forecast" className="text-gray-300 hover:text-white transition-colors">Market Forecast</Link>
               </li>
               <li>
-                <Link to="/chat" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  AI Finance Chat
-                </Link>
+                <Link to="/risk-assessment" className="text-gray-300 hover:text-white transition-colors">Risk Assessment</Link>
               </li>
               <li>
-                <Link to="/investments" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  Investment Suggestions
-                </Link>
+                <Link to="/investments" className="text-gray-300 hover:text-white transition-colors">Investment Suggestions</Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-medium text-gray-900 mb-4">Resources</h3>
-            <ul className="space-y-3">
+            <h3 className="text-lg font-bold mb-4">Resources</h3>
+            <ul className="space-y-2">
               <li>
-                <Link to="/financial-literacy" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  Financial Literacy
-                </Link>
+                <Link to="/financial-literacy" className="text-gray-300 hover:text-white transition-colors">Financial Literacy</Link>
               </li>
               <li>
-                <Link to="/market-updates" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  Market Updates
-                </Link>
+                <Link to="/market-updates" className="text-gray-300 hover:text-white transition-colors">Market Updates</Link>
               </li>
               <li>
-                <Link to="/investment-basics" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  Investment Basics
-                </Link>
+                <Link to="/investment-basics" className="text-gray-300 hover:text-white transition-colors">Investment Basics</Link>
               </li>
               <li>
-                <Link to="/faq" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  FAQ
-                </Link>
+                <Link to="/faq" className="text-gray-300 hover:text-white transition-colors">FAQ</Link>
+              </li>
+              <li>
+                <Link to="/security-info" className="text-gray-300 hover:text-white transition-colors">Security & Privacy</Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-medium text-gray-900 mb-4">Legal</h3>
-            <ul className="space-y-3">
+            <h3 className="text-lg font-bold mb-4">Legal</h3>
+            <ul className="space-y-2">
               <li>
-                <Link to="/privacy-policy" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  Privacy Policy
-                </Link>
+                <Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</Link>
               </li>
               <li>
-                <Link to="/terms-of-service" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  Terms of Service
-                </Link>
+                <Link to="/terms-of-service" className="text-gray-300 hover:text-white transition-colors">Terms of Service</Link>
               </li>
               <li>
-                <Link to="/disclaimer" className="text-gray-600 hover:text-finance-primary text-sm transition-colors">
-                  Disclaimer
-                </Link>
+                <Link to="/disclaimer" className="text-gray-300 hover:text-white transition-colors">Disclaimer</Link>
               </li>
             </ul>
           </div>
         </div>
         
-        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} FinAce. All rights reserved.
-          </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link to="/social/twitter" className="text-gray-500 hover:text-finance-primary transition-colors">
-              <span className="sr-only">Twitter</span>
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-              </svg>
-            </Link>
-            <Link to="/social/linkedin" className="text-gray-500 hover:text-finance-primary transition-colors">
-              <span className="sr-only">LinkedIn</span>
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-              </svg>
-            </Link>
-            <Link to="/social/github" className="text-gray-500 hover:text-finance-primary transition-colors">
-              <span className="sr-only">GitHub</span>
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-              </svg>
-            </Link>
-          </div>
+        <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-gray-400 text-center">
+          <p>© 2023 FinAce. All rights reserved.</p>
+          <p className="mt-2">FinAce is a fictional application created for demonstration purposes.</p>
         </div>
       </div>
     </footer>

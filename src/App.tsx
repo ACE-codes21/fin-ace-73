@@ -18,6 +18,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Disclaimer from "./pages/Disclaimer";
 import SocialRedirect from "./pages/SocialRedirect";
+import SecurityInfo from "./pages/SecurityInfo";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/security-info" element={<SecurityInfo />} />
           
           {/* Social redirects */}
           <Route path="/social/:platform" element={<SocialRedirect />} />

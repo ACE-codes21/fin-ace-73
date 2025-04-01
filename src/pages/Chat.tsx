@@ -5,10 +5,10 @@ import remarkGfm from 'remark-gfm';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, User, Bot, Info, XCircle, Loader2 } from 'lucide-react';
+import { Send, User, Bot, Info, XCircle, Loader2, RefreshCcw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ChatError } from "@/components/chat/ChatError";
 import {
   Tooltip,
   TooltipContent,
@@ -38,7 +38,7 @@ const Chat = () => {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('openai_api_key') || '');
   const [showApiKeyInput, setShowApiKeyInput] = useState(!localStorage.getItem('openai_api_key'));
   const [isRateLimited, setIsRateLimited] = useState(false);
-  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
+  const [apiKeyError, setApiKeyError] = useState<{title?: string; message: string} | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -92,6 +92,31 @@ const Chat = () => {
       title: "API Key Removed",
       description: "Your OpenAI API key has been removed from local storage.",
     });
+  };
+
+  const retryAfterRateLimit = () => {
+    if (!isRateLimited) {
+      setIsRateLimited(false);
+      setApiKeyError(null);
+      toast({
+        title: "Ready",
+        description: "You can now send messages again.",
+      });
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputMessage(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Only submit on Enter without Shift key
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // Prevent default to avoid form submission
+      if (inputMessage.trim() !== '') {
+        handleSendMessage();
+      }
+    }
   };
 
   const handleSendMessage = async (e?: React.FormEvent) => {
@@ -151,7 +176,10 @@ const Chat = () => {
       const response = await fetchOpenAIResponse(apiKey, openAIMessages);
       
       if (response.error) {
-        setApiKeyError(response.error.message);
+        setApiKeyError({
+          title: response.error.title || 'Error',
+          message: response.error.message
+        });
         
         if (response.error.status === 401) {
           // If authentication failed, prompt for a new API key
@@ -192,17 +220,17 @@ const Chat = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-4 md:py-8">
+      <div className="container mx-auto px-4 py-4 md:py-8 animate-fade-in">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl md:text-2xl font-bold">Finance AI Assistant</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-finance-primary">FinAce Assistant</h1>
             <div className="flex items-center gap-2">
               {!showApiKeyInput && (
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={clearApiKey}
-                  className="text-xs"
+                  className="text-xs hover:bg-red-50 hover:text-red-500 transition-colors"
                 >
                   <XCircle className="h-3 w-3 mr-1" />
                   Reset Key
@@ -215,7 +243,7 @@ const Chat = () => {
                       <Info className="h-5 w-5 text-finance-primary" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-sm">
+                  <TooltipContent className="max-w-sm bg-white/90 backdrop-blur-sm">
                     <p>Ask me anything about investments, financial planning, or the Indian financial market. I can help with mutual funds, stocks, tax planning, and more.</p>
                   </TooltipContent>
                 </Tooltip>
@@ -224,25 +252,24 @@ const Chat = () => {
           </div>
           
           {isRateLimited && (
-            <Alert className="mb-4">
-              <AlertTitle>Rate Limit Exceeded</AlertTitle>
-              <AlertDescription>
-                You've hit OpenAI's rate limit. Please wait a minute before sending another message.
-              </AlertDescription>
-            </Alert>
+            <ChatError
+              title="Rate Limit Exceeded"
+              description="You've hit OpenAI's rate limit. Please wait a minute before sending another message."
+              retryAction={retryAfterRateLimit}
+            />
           )}
           
           {apiKeyError && !showApiKeyInput && (
-            <Alert className="mb-4" variant="destructive">
-              <AlertTitle>API Key Error</AlertTitle>
-              <AlertDescription>{apiKeyError}</AlertDescription>
-            </Alert>
+            <ChatError
+              title={apiKeyError.title || "API Error"}
+              description={apiKeyError.message}
+            />
           )}
           
           {showApiKeyInput ? (
-            <Card className="mb-4 border border-gray-200">
+            <Card className="mb-4 border border-gray-200 animate-fade-in shadow-md">
               <CardContent className="p-6">
-                <h2 className="text-lg font-semibold mb-4">Enter Your OpenAI API Key</h2>
+                <h2 className="text-lg font-semibold mb-4 text-finance-primary">Enter Your OpenAI API Key</h2>
                 <p className="text-gray-600 mb-4">
                   To access expert financial AI advice, please enter your OpenAI API key. 
                   This key will be stored locally in your browser and is only used to make requests to OpenAI.
@@ -263,13 +290,13 @@ const Chat = () => {
                   </Button>
                 </form>
                 {apiKeyError && (
-                  <p className="mt-2 text-sm text-red-500">{apiKeyError}</p>
+                  <p className="mt-2 text-sm text-red-500">{apiKeyError.message}</p>
                 )}
               </CardContent>
             </Card>
           ) : (
             <>
-              <Card className="mb-4 border border-gray-200">
+              <Card className="mb-4 border border-gray-200 shadow-md overflow-hidden">
                 <CardContent className="p-0">
                   <div 
                     ref={chatContainerRef}
@@ -278,13 +305,13 @@ const Chat = () => {
                     {messages.map((message) => (
                       <div
                         key={message.id}
-                        className={`flex mb-4 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex mb-4 ${message.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
                       >
                         <div className={`flex max-w-[85%] md:max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
                           <div className={`flex items-center justify-center h-8 w-8 rounded-full flex-shrink-0 ${
                             message.sender === 'user' 
-                              ? 'bg-finance-primary ml-2' 
-                              : 'bg-finance-accent mr-2'
+                              ? 'bg-finance-primary ml-2 shadow-md' 
+                              : 'bg-finance-accent mr-2 shadow-md'
                           }`}>
                             {message.sender === 'user' ? (
                               <User className="h-4 w-4 text-white" />
@@ -293,7 +320,7 @@ const Chat = () => {
                             )}
                           </div>
                           <div
-                            className={`p-3 rounded-lg ${
+                            className={`p-3 rounded-lg shadow-sm ${
                               message.sender === 'user'
                                 ? 'bg-finance-primary text-white'
                                 : 'bg-gray-100 text-gray-800'
@@ -318,14 +345,18 @@ const Chat = () => {
                       </div>
                     ))}
                     {isAITyping && (
-                      <div className="flex mb-4 justify-start">
+                      <div className="flex mb-4 justify-start animate-fade-in">
                         <div className="flex">
-                          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-finance-accent mr-2">
+                          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-finance-accent mr-2 shadow-md">
                             <Bot className="h-4 w-4 text-white" />
                           </div>
-                          <div className="p-3 rounded-lg bg-gray-100 text-gray-800">
-                            <div className="flex space-x-1 items-center">
-                              <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                          <div className="p-3 rounded-lg bg-gray-100 text-gray-800 shadow-sm">
+                            <div className="flex space-x-2 items-center">
+                              <div className="flex space-x-1">
+                                <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></span>
+                                <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></span>
+                              </div>
                               <span className="text-sm text-gray-500">Thinking...</span>
                             </div>
                           </div>
@@ -337,22 +368,25 @@ const Chat = () => {
                 </CardContent>
               </Card>
               
-              <form onSubmit={handleSendMessage} className="flex space-x-2">
-                <Input
-                  placeholder="Ask me about investing in the Indian market..."
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  className="flex-grow input-field"
-                  disabled={isRateLimited || isAITyping}
-                />
-                <Button 
-                  type="submit"
-                  className="bg-finance-primary hover:bg-finance-primary/90"
-                  disabled={inputMessage.trim() === '' || isAITyping || isRateLimited}
-                >
-                  <Send className="h-5 w-5" />
-                </Button>
-              </form>
+              <div className="chat-form-container">
+                <form onSubmit={handleSendMessage} className="flex space-x-2">
+                  <Input
+                    placeholder="Ask me about investing in the Indian market..."
+                    value={inputMessage}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    className="flex-grow input-field shadow-sm focus:shadow-md transition-shadow"
+                    disabled={isRateLimited || isAITyping}
+                  />
+                  <Button 
+                    type="submit"
+                    className="bg-finance-primary hover:bg-finance-primary/90 shadow-sm"
+                    disabled={inputMessage.trim() === '' || isAITyping || isRateLimited}
+                  >
+                    <Send className="h-5 w-5" />
+                  </Button>
+                </form>
+              </div>
             </>
           )}
         </div>

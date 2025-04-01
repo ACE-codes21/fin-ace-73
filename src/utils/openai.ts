@@ -9,6 +9,7 @@ export interface OpenAIResponse {
   error?: {
     status?: number;
     message: string;
+    title?: string; // Adding a title field for better UI display
   };
 }
 
@@ -37,10 +38,11 @@ export const fetchOpenAIResponse = async (
       
       if (status === 429 || status === 403) {
         return {
-          text: "I'm currently experiencing high demand. Please verify your OpenAI API key or wait before trying again.",
+          text: "I'm currently experiencing high demand. Please wait a minute before sending another message.",
           error: {
             status,
-            message: "Rate limit exceeded. Please wait a moment before sending another message or check your API plan limits."
+            title: "Rate Limit Exceeded",
+            message: "You've reached OpenAI's rate limit. Please wait about a minute before trying again or check your plan limits."
           }
         };
       }
@@ -50,7 +52,8 @@ export const fetchOpenAIResponse = async (
           text: "Authentication failed. Please verify your API key.",
           error: {
             status,
-            message: "Invalid API key. Please check and re-enter your OpenAI API key."
+            title: "API Key Invalid",
+            message: "Your OpenAI API key appears to be invalid or expired. Please check and re-enter your key."
           }
         };
       }
@@ -59,7 +62,8 @@ export const fetchOpenAIResponse = async (
         text: `Connection error. Status: ${status}. Please try again later.`,
         error: {
           status,
-          message: `Error ${status}: ${response.statusText}`
+          title: "Connection Error",
+          message: `Error ${status}: ${response.statusText}. Please try again in a moment.`
         }
       };
     }
@@ -71,7 +75,8 @@ export const fetchOpenAIResponse = async (
     return {
       text: "An unexpected error occurred. Please try again later.",
       error: {
-        message: error instanceof Error ? error.message : "Unknown error"
+        message: error instanceof Error ? error.message : "Unknown error",
+        title: "Unexpected Error"
       }
     };
   }

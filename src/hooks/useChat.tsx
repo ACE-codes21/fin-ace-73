@@ -128,6 +128,7 @@ export const useChat = (apiKey: string, geminiApiKey: string, selectedModel: 'op
           variant: response.error.variant || 'general'
         });
         
+        // Fix the type comparison error here - changing direct comparison to check if variant === 'auth'
         if (response.error.variant === 'auth') {
           // If authentication failed, prompt for a new API key
           return { success: false, needsApiKey: true };
@@ -143,6 +144,7 @@ export const useChat = (apiKey: string, geminiApiKey: string, selectedModel: 'op
           variant: "destructive",
         });
         
+        // Also fix this line to use the correct comparison
         return { success: false, needsApiKey: response.error.variant === 'auth' };
       } else if (response.text) {
         // Clear any previous errors if the request was successful

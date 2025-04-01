@@ -9,7 +9,8 @@ export interface OpenAIResponse {
   error?: {
     status?: number;
     message: string;
-    title?: string; // Adding a title field for better UI display
+    title?: string;
+    variant?: 'rate-limit' | 'auth' | 'general';
   };
 }
 
@@ -42,7 +43,8 @@ export const fetchOpenAIResponse = async (
           error: {
             status,
             title: "Rate Limit Exceeded",
-            message: "You've reached OpenAI's rate limit. Please wait about a minute before trying again or check your plan limits."
+            message: "You've reached OpenAI's rate limit. Please wait about a minute before trying again or check your plan limits.",
+            variant: "rate-limit"
           }
         };
       }
@@ -53,7 +55,8 @@ export const fetchOpenAIResponse = async (
           error: {
             status,
             title: "API Key Invalid",
-            message: "Your OpenAI API key appears to be invalid or expired. Please check and re-enter your key."
+            message: "Your OpenAI API key appears to be invalid or expired. Please check and re-enter your key.",
+            variant: "auth"
           }
         };
       }
@@ -63,7 +66,8 @@ export const fetchOpenAIResponse = async (
         error: {
           status,
           title: "Connection Error",
-          message: `Error ${status}: ${response.statusText}. Please try again in a moment.`
+          message: `Error ${status}: ${response.statusText}. Please try again in a moment.`,
+          variant: "general"
         }
       };
     }
@@ -76,7 +80,8 @@ export const fetchOpenAIResponse = async (
       text: "An unexpected error occurred. Please try again later.",
       error: {
         message: error instanceof Error ? error.message : "Unknown error",
-        title: "Unexpected Error"
+        title: "Unexpected Error",
+        variant: "general"
       }
     };
   }

@@ -21,12 +21,12 @@ const Index = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/chat">
-                  <Button className="bg-finance-primary hover:bg-finance-primary/90 text-white px-6 py-5 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                  <Button className="bg-finance-primary hover:bg-finance-primary/90 text-white px-6 py-5 transform transition-all duration-300 hover:scale-105 hover:shadow-lg w-full sm:w-auto">
                     Get Started <ArrowRight className="ml-2 h-5 w-5 animate-pulse-slow" />
                   </Button>
                 </Link>
                 <Link to="/forecast">
-                  <Button variant="outline" className="border-finance-primary text-finance-primary hover:bg-finance-primary/10 px-6 py-5 transition-all duration-300 hover:shadow-md">
+                  <Button variant="outline" className="border-finance-primary text-finance-primary hover:bg-finance-primary/10 px-6 py-5 transition-all duration-300 hover:shadow-md w-full sm:w-auto">
                     Try Financial Forecasting
                   </Button>
                 </Link>

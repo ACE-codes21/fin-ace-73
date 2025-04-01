@@ -46,8 +46,22 @@ const Chat = () => {
     },
   ]);
   const [isAITyping, setIsAITyping] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('openai_api_key') || '');
-  const [showApiKeyInput, setShowApiKeyInput] = useState(!localStorage.getItem('openai_api_key'));
+  const [apiKey, setApiKey] = useState(() => {
+    try {
+      return localStorage.getItem('openai_api_key') || '';
+    } catch (e) {
+      console.error("Error reading from localStorage:", e);
+      return '';
+    }
+  });
+  const [showApiKeyInput, setShowApiKeyInput] = useState(() => {
+    try {
+      return !localStorage.getItem('openai_api_key');
+    } catch (e) {
+      console.error("Error reading from localStorage:", e);
+      return true;
+    }
+  });
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [apiKeyError, setApiKeyError] = useState<{title?: string; message: string; variant?: 'rate-limit' | 'auth' | 'general'} | null>(null);
   const [activeTab, setActiveTab] = useState<string>("chat");
@@ -57,10 +71,16 @@ const Chat = () => {
   const { toast } = useToast();
 
   const scrollToBottom = () => {
-    // Use requestAnimationFrame to ensure we scroll after the DOM has updated
-    requestAnimationFrame(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    });
+    try {
+      // Use requestAnimationFrame to ensure we scroll after the DOM has updated
+      requestAnimationFrame(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    } catch (e) {
+      console.error("Error scrolling to bottom:", e);
+    }
   };
 
   useEffect(() => {
@@ -79,13 +99,22 @@ const Chat = () => {
 
   const saveApiKey = () => {
     if (apiKey.trim()) {
-      localStorage.setItem('openai_api_key', apiKey);
-      setShowApiKeyInput(false);
-      setApiKeyError(null);
-      toast({
-        title: "API Key Saved",
-        description: "Your OpenAI API key has been saved securely to your browser's local storage.",
-      });
+      try {
+        localStorage.setItem('openai_api_key', apiKey);
+        setShowApiKeyInput(false);
+        setApiKeyError(null);
+        toast({
+          title: "API Key Saved",
+          description: "Your OpenAI API key has been saved securely to your browser's local storage.",
+        });
+      } catch (e) {
+        console.error("Error saving to localStorage:", e);
+        toast({
+          title: "Error",
+          description: "Could not save API key to local storage.",
+          variant: "destructive",
+        });
+      }
     } else {
       toast({
         title: "Error",
@@ -96,14 +125,23 @@ const Chat = () => {
   };
 
   const clearApiKey = () => {
-    localStorage.removeItem('openai_api_key');
-    setApiKey('');
-    setShowApiKeyInput(true);
-    setApiKeyError(null);
-    toast({
-      title: "API Key Removed",
-      description: "Your OpenAI API key has been removed from local storage.",
-    });
+    try {
+      localStorage.removeItem('openai_api_key');
+      setApiKey('');
+      setShowApiKeyInput(true);
+      setApiKeyError(null);
+      toast({
+        title: "API Key Removed",
+        description: "Your OpenAI API key has been removed from local storage.",
+      });
+    } catch (e) {
+      console.error("Error removing from localStorage:", e);
+      toast({
+        title: "Error",
+        description: "Could not remove API key from local storage.",
+        variant: "destructive",
+      });
+    }
   };
 
   const retryAfterRateLimit = () => {

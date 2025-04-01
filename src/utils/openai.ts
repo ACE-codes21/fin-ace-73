@@ -19,6 +19,17 @@ export const fetchOpenAIResponse = async (
   messages: OpenAIMessage[]
 ): Promise<OpenAIResponse> => {
   try {
+    if (!apiKey || apiKey.trim() === '') {
+      return {
+        text: "Please provide a valid OpenAI API key.",
+        error: {
+          title: "API Key Missing",
+          message: "You need to provide an OpenAI API key to continue.",
+          variant: "auth"
+        }
+      };
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -38,6 +49,7 @@ export const fetchOpenAIResponse = async (
       const status = response.status;
       
       if (status === 429 || status === 403) {
+        console.log("Rate limit exceeded, status:", status);
         return {
           text: "I'm currently experiencing high demand. Please wait a minute before sending another message.",
           error: {
@@ -50,6 +62,7 @@ export const fetchOpenAIResponse = async (
       }
       
       if (status === 401) {
+        console.log("Authentication failed, status:", status);
         return {
           text: "Authentication failed. Please verify your API key.",
           error: {
@@ -61,6 +74,7 @@ export const fetchOpenAIResponse = async (
         };
       }
       
+      console.log("General API error, status:", status);
       return {
         text: `Connection error. Status: ${status}. Please try again later.`,
         error: {

@@ -24,7 +24,7 @@ export const fetchOpenAIResponse = async (
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-3.5-turbo',
         messages,
         temperature: 0.7,
         max_tokens: 800
@@ -40,7 +40,7 @@ export const fetchOpenAIResponse = async (
           text: "I'm currently experiencing high demand. Please verify your OpenAI API key or wait before trying again.",
           error: {
             status,
-            message: "Your API key has reached its usage limit. Please check your account or try a different key."
+            message: "Rate limit exceeded. Please wait a moment before sending another message or check your API plan limits."
           }
         };
       }

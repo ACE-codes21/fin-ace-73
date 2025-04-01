@@ -6,54 +6,49 @@ import FeaturesSection from '@/components/home/FeaturesSection';
 import HowItWorksSection from '@/components/home/HowItWorksSection';
 import StatsSection from '@/components/home/StatsSection';
 import CTASection from '@/components/home/CTASection';
+import { useInView } from 'react-intersection-observer';
+import ParticlesBackground from '@/components/effects/ParticlesBackground';
 
 const Index = () => {
-  const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      
-      sectionsRef.current.forEach((section, index) => {
-        if (!section) return;
-        
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.offsetHeight;
-        
-        // Calculate when the section is in view
-        if (scrollY > sectionTop - windowHeight / 1.2 && 
-            scrollY < sectionTop + sectionHeight) {
-          section.classList.add('animate-fade-in');
-          section.style.opacity = '1';
-        }
-      });
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+  const [featuresRef, featuresInView] = useInView({ threshold: 0.2, triggerOnce: true });
+  const [howItWorksRef, howItWorksInView] = useInView({ threshold: 0.2, triggerOnce: true });
+  const [statsRef, statsInView] = useInView({ threshold: 0.2, triggerOnce: true });
+  const [ctaRef, ctaInView] = useInView({ threshold: 0.2, triggerOnce: true });
   
   return (
     <Layout>
-      <div>
-        <div>
+      <div className="relative overflow-hidden">
+        <ParticlesBackground />
+        
+        <div className="relative z-10">
           <HeroSection />
         </div>
-        <div ref={(el) => (sectionsRef.current[0] = el)} style={{ opacity: 0 }}>
+        
+        <div 
+          ref={featuresRef} 
+          className={`relative z-10 transition-all duration-1000 transform ${featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
           <FeaturesSection />
         </div>
-        <div ref={(el) => (sectionsRef.current[1] = el)} style={{ opacity: 0 }}>
+        
+        <div 
+          ref={howItWorksRef} 
+          className={`relative z-10 transition-all duration-1000 transform ${howItWorksInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
           <HowItWorksSection />
         </div>
-        <div ref={(el) => (sectionsRef.current[2] = el)} style={{ opacity: 0 }}>
+        
+        <div 
+          ref={statsRef} 
+          className={`relative z-10 transition-all duration-1000 transform ${statsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
           <StatsSection />
         </div>
-        <div ref={(el) => (sectionsRef.current[3] = el)} style={{ opacity: 0 }}>
+        
+        <div 
+          ref={ctaRef} 
+          className={`relative z-10 transition-all duration-1000 transform ${ctaInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
           <CTASection />
         </div>
       </div>

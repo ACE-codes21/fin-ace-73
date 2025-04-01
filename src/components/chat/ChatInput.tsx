@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Info, Loader2 } from 'lucide-react';
+import { Send, Loader2, RefreshCcw } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -61,18 +61,18 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 className="text-gray-500 hover:text-red-500"
                 type="button"
               >
-                <Info className="h-5 w-5" />
+                <RefreshCcw className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Clear API Key</p>
+              <p>Clear Chat</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </form>
       
       <div className="text-xs text-gray-500 text-center mt-2">
-        Your API key is stored locally and never sent to our servers.
+        Demo chatbot with pre-programmed responses
       </div>
     </div>
   );

@@ -1,7 +1,5 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
-import { ChatError } from "@/components/chat/ChatError";
 import { RealTimeMarketData } from "@/components/market/RealTimeMarketData";
 import ErrorBoundary from "@/components/chat/ErrorBoundary";
 import {
@@ -10,44 +8,23 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { Bot, Server, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useApiKeys } from '@/hooks/useApiKeys';
+import { Bot, Server } from 'lucide-react';
 import { useChat } from '@/hooks/useChat';
 import { useChatScroll } from '@/hooks/useChatScroll';
-import ApiKeyInput from '@/components/chat/ApiKeyInput';
 import ChatContainer from '@/components/chat/ChatContainer';
 import ChatInput from '@/components/chat/ChatInput';
 
 const Chat = () => {
-  // API key and model state management
-  const {
-    apiKey,
-    setApiKey,
-    geminiApiKey,
-    setGeminiApiKey,
-    selectedModel,
-    setSelectedModel,
-    showApiKeyInput,
-    setShowApiKeyInput,
-    saveApiKey,
-    clearApiKey,
-    switchAIProvider,
-  } = useApiKeys();
-
   // Chat functionality
   const {
     messages,
     inputMessage,
     setInputMessage,
     isAITyping,
-    isRateLimited,
-    apiKeyError,
-    rateLimitTimer,
     sendMessage,
     handleFeedbackSubmit,
-    retryAfterRateLimit,
-  } = useChat(apiKey, geminiApiKey, selectedModel);
+    setMessages,
+  } = useChat();
 
   // Chat scrolling behavior
   const {
@@ -80,16 +57,14 @@ const Chat = () => {
     
     if (inputMessage.trim() === '') return;
     
-    // Check if we have the necessary API key
-    const needsApiKey = (selectedModel === 'openai' && !apiKey) || 
-                       (selectedModel === 'gemini' && !geminiApiKey);
-                       
-    if (needsApiKey && !showApiKeyInput) {
-      setShowApiKeyInput(true);
-      return;
-    }
-    
     await sendMessage();
+  };
+
+  const clearChat = () => {
+    // Clear all messages except the initial greeting
+    const initialGreeting = messages[0];
+    setInputMessage('');
+    setMessages([initialGreeting]);
   };
 
   return (
@@ -105,18 +80,6 @@ const Chat = () => {
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  {!showApiKeyInput && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={switchAIProvider}
-                      className="text-xs md:text-sm border-finance-primary/30 text-finance-primary hover:bg-finance-primary/10"
-                    >
-                      <RotateCcw className="h-3 w-3 mr-1" />
-                      Switch to {selectedModel === 'openai' ? 'Gemini' : 'OpenAI'}
-                    </Button>
-                  )}
-                  
                   <TabsList className="grid grid-cols-2 w-full md:w-auto">
                     <TabsTrigger value="chat" className="text-xs md:text-sm">
                       <Bot className="h-4 w-4 mr-1 md:mr-2" />
@@ -133,63 +96,32 @@ const Chat = () => {
               </div>
 
               <TabsContent value="chat" className="mt-0">
-                {showApiKeyInput ? (
-                  <ApiKeyInput 
-                    apiKey={apiKey}
-                    setApiKey={setApiKey}
-                    geminiApiKey={geminiApiKey}
-                    setGeminiApiKey={setGeminiApiKey}
-                    selectedModel={selectedModel}
-                    setSelectedModel={setSelectedModel}
-                    saveApiKey={saveApiKey}
-                    apiKeyError={apiKeyError}
-                  />
-                ) : (
-                  <>
-                    <div className="grid grid-cols-1 gap-6">
-                      <div>
-                        {apiKeyError && (
-                          <ChatError
-                            title={apiKeyError.title || "API Error"}
-                            description={apiKeyError.message}
-                            retryAction={isRateLimited ? retryAfterRateLimit : switchAIProvider}
-                            variant={apiKeyError.variant || 'general'}
-                            className="mb-4"
-                          />
-                        )}
-                        
-                        {isRateLimited && (
-                          <ChatError
-                            title={`Rate Limit Exceeded (${rateLimitTimer}s)`}
-                            description="You've hit the rate limit. Please wait before sending another message or try switching to a different AI provider."
-                            retryAction={selectedModel === 'openai' ? switchAIProvider : retryAfterRateLimit}
-                            variant="rate-limit"
-                            className="mb-4"
-                          />
-                        )}
-                        
-                        <ChatContainer 
-                          messages={messages}
-                          isAITyping={isAITyping}
-                          chatContainerRef={chatContainerRef}
-                          messagesEndRef={messagesEndRef}
-                          handleScroll={handleScroll}
-                          onFeedbackSubmit={handleFeedbackSubmit}
-                        />
-                        
-                        <ChatInput 
-                          inputMessage={inputMessage}
-                          setInputMessage={setInputMessage}
-                          handleSendMessage={handleSendMessage}
-                          isAITyping={isAITyping}
-                          isRateLimited={isRateLimited}
-                          clearApiKey={clearApiKey}
-                          handleKeyDown={handleKeyDown}
-                        />
-                      </div>
+                <div className="grid grid-cols-1 gap-6">
+                  <div>
+                    <ChatContainer 
+                      messages={messages}
+                      isAITyping={isAITyping}
+                      chatContainerRef={chatContainerRef}
+                      messagesEndRef={messagesEndRef}
+                      handleScroll={handleScroll}
+                      onFeedbackSubmit={handleFeedbackSubmit}
+                    />
+                    
+                    <ChatInput 
+                      inputMessage={inputMessage}
+                      setInputMessage={setInputMessage}
+                      handleSendMessage={handleSendMessage}
+                      isAITyping={isAITyping}
+                      isRateLimited={false}
+                      clearApiKey={clearChat}
+                      handleKeyDown={handleKeyDown}
+                    />
+
+                    <div className="text-xs text-gray-500 text-center mt-2">
+                      This is a demo with pre-programmed responses. No API keys required.
                     </div>
-                  </>
-                )}
+                  </div>
+                </div>
               </TabsContent>
               
               <TabsContent value="market">

@@ -1,10 +1,7 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white pt-12 pb-8">
+  return <footer className="bg-gray-900 text-white pt-12 pb-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
@@ -38,7 +35,7 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-4">Features</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/chat" className="text-gray-300 hover:text-white transition-colors">AI Advisor</Link>
+                <Link to="/chat" className="text-gray-300 hover:text-white transition-colors">FinAce AI</Link>
               </li>
               <li>
                 <Link to="/forecast" className="text-gray-300 hover:text-white transition-colors">Market Forecast</Link>
@@ -94,8 +91,6 @@ const Footer = () => {
           <p className="mt-2">FinAce is a financial guidance platform created for educational purposes.</p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;

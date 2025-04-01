@@ -20,7 +20,16 @@ import Disclaimer from "./pages/Disclaimer";
 import SocialRedirect from "./pages/SocialRedirect";
 import SecurityInfo from "./pages/SecurityInfo";
 
-const queryClient = new QueryClient();
+// Create a new query client with better error handling
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

@@ -67,9 +67,6 @@ const Footer = () => {
               <li>
                 <Link to="/faq" className="text-gray-300 hover:text-white transition-colors">FAQ</Link>
               </li>
-              <li>
-                <Link to="/security-info" className="text-gray-300 hover:text-white transition-colors">Security & Privacy</Link>
-              </li>
             </ul>
           </div>
           
@@ -85,13 +82,16 @@ const Footer = () => {
               <li>
                 <Link to="/disclaimer" className="text-gray-300 hover:text-white transition-colors">Disclaimer</Link>
               </li>
+              <li>
+                <Link to="/security-info" className="text-gray-300 hover:text-white transition-colors">Security & Privacy</Link>
+              </li>
             </ul>
           </div>
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-gray-400 text-center">
           <p>© 2023 FinAce. All rights reserved.</p>
-          <p className="mt-2">FinAce is a fictional application created for demonstration purposes.</p>
+          <p className="mt-2">FinAce is a financial guidance platform created for educational purposes.</p>
         </div>
       </div>
     </footer>

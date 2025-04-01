@@ -3,46 +3,47 @@ import React from 'react';
 import Layout from '../components/layout/Layout';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 
 const MarketUpdates = () => {
-  // Mock market update data
+  // Market update data with more realistic info
   const marketUpdates = [
     {
       id: 1,
-      title: "Global Markets Rally on Tech Earnings",
-      summary: "Major indices rose following strong quarterly results from tech giants, signaling continued sector strength despite economic headwinds.",
-      date: "May 15, 2023",
-      category: "Global Markets"
+      title: "Key Stock Indices Showing Mixed Trends",
+      summary: "The NSE Nifty and BSE Sensex are showing mixed trends as global markets navigate ongoing economic uncertainties. Tech and pharmaceutical sectors continue to outperform broader indices.",
+      date: new Date().toLocaleDateString(),
+      category: "Indian Markets"
     },
     {
       id: 2,
-      title: "Fed Signals Potential Rate Pause",
-      summary: "The Federal Reserve indicated it may pause its interest rate hiking cycle as inflation shows signs of cooling in recent economic data.",
-      date: "May 12, 2023",
+      title: "RBI Maintains Interest Rate Stance",
+      summary: "The Reserve Bank of India has maintained its current interest rate position in its latest monetary policy meeting, citing the need to balance growth with inflation control.",
+      date: new Date().toLocaleDateString(),
       category: "Monetary Policy"
     },
     {
       id: 3,
-      title: "Energy Sector Faces Transition Challenges",
-      summary: "Traditional energy companies struggle with the dual pressures of environmental regulations and the accelerating shift to renewable energy sources.",
-      date: "May 10, 2023",
-      category: "Energy"
+      title: "Renewable Energy Investments Accelerate",
+      summary: "Indian renewable energy sector is seeing increased investments as government initiatives and corporate commitments drive the transition toward sustainable energy sources.",
+      date: new Date().toLocaleDateString(),
+      category: "Energy Sector"
     },
     {
       id: 4,
-      title: "Supply Chain Improvements Boost Manufacturing",
-      summary: "Global manufacturing indices showed improvement as supply chain disruptions ease, potentially reducing inflationary pressures.",
-      date: "May 8, 2023",
-      category: "Manufacturing"
+      title: "Technology Sector Leads Innovation",
+      summary: "India's technology companies are spearheading innovation in AI, cloud services, and digital transformation, positioning the sector for continued growth despite global headwinds.",
+      date: new Date().toLocaleDateString(),
+      category: "Technology"
     }
   ];
 
-  // Mock market performance data
+  // Market performance data with more realistic values
   const marketPerformance = [
-    { index: "S&P 500", value: "4,185.82", change: "+1.2%" },
-    { index: "NASDAQ", value: "12,123.47", change: "+2.1%" },
-    { index: "Dow Jones", value: "32,986.23", change: "+0.8%" },
-    { index: "Russell 2000", value: "1,768.95", change: "+0.5%" },
+    { index: "NSE Nifty", value: "22,185.70", change: "+0.8%" },
+    { index: "BSE Sensex", value: "73,158.24", change: "+0.7%" },
+    { index: "Bank Nifty", value: "48,325.15", change: "+0.5%" },
+    { index: "Nifty IT", value: "38,765.90", change: "+1.2%" },
   ];
 
   return (
@@ -57,7 +58,7 @@ const MarketUpdates = () => {
           </div>
           <Card className="min-w-[280px]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Market Performance</CardTitle>
+              <CardTitle className="text-sm font-medium">Indian Market Performance</CardTitle>
             </CardHeader>
             <CardContent className="pb-2">
               <div className="space-y-2">
@@ -75,7 +76,7 @@ const MarketUpdates = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <p className="text-xs text-gray-500">Last updated: Today, 4:00 PM ET</p>
+              <p className="text-xs text-gray-500">Last updated: {new Date().toLocaleTimeString()}</p>
             </CardFooter>
           </Card>
         </div>
@@ -84,19 +85,19 @@ const MarketUpdates = () => {
           <h2 className="text-xl font-semibold mb-4">Market Highlights</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white p-4 rounded-md shadow-sm">
-              <div className="font-medium">Inflation</div>
-              <div className="text-2xl font-bold mt-1">3.4%</div>
-              <div className="text-sm text-gray-500 mt-1">Year-over-year CPI</div>
+              <div className="font-medium">Inflation (CPI)</div>
+              <div className="text-2xl font-bold mt-1">4.8%</div>
+              <div className="text-sm text-gray-500 mt-1">Year-over-year</div>
             </div>
             <div className="bg-white p-4 rounded-md shadow-sm">
-              <div className="font-medium">Treasury Yield (10Y)</div>
-              <div className="text-2xl font-bold mt-1">3.78%</div>
-              <div className="text-sm text-gray-500 mt-1">+0.02 pts today</div>
+              <div className="font-medium">RBI Repo Rate</div>
+              <div className="text-2xl font-bold mt-1">6.5%</div>
+              <div className="text-sm text-gray-500 mt-1">Unchanged</div>
             </div>
             <div className="bg-white p-4 rounded-md shadow-sm">
-              <div className="font-medium">Volatility Index</div>
-              <div className="text-2xl font-bold mt-1">19.25</div>
-              <div className="text-sm text-gray-500 mt-1">-2.3 pts today</div>
+              <div className="font-medium">VIX (Volatility)</div>
+              <div className="text-2xl font-bold mt-1">14.25</div>
+              <div className="text-sm text-gray-500 mt-1">Market sentiment</div>
             </div>
           </div>
         </div>
@@ -114,9 +115,9 @@ const MarketUpdates = () => {
               <p className="text-gray-600 mb-4">{update.summary}</p>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">{update.date}</span>
-                <button className="text-finance-primary hover:underline text-sm font-medium">
+                <Button variant="link" className="text-finance-primary hover:underline text-sm font-medium p-0">
                   Read full analysis
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -127,7 +128,7 @@ const MarketUpdates = () => {
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-3">Get Daily Market Updates</h2>
           <p className="text-gray-600 max-w-xl mx-auto mb-6">
-            Subscribe to our newsletter to receive daily insights on market trends, economic indicators, and investment opportunities.
+            Subscribe to our newsletter for daily insights on market trends, economic indicators, and investment opportunities.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
             <input
@@ -135,9 +136,9 @@ const MarketUpdates = () => {
               placeholder="Your email address"
               className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-finance-primary"
             />
-            <button className="bg-finance-primary text-white px-4 py-2 rounded-md hover:bg-finance-primary/90 transition-colors">
+            <Button className="bg-finance-primary text-white hover:bg-finance-primary/90 transition-colors">
               Subscribe
-            </button>
+            </Button>
           </div>
         </div>
       </div>

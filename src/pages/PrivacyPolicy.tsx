@@ -4,13 +4,15 @@ import Layout from '../components/layout/Layout';
 import { Separator } from '@/components/ui/separator';
 
 const PrivacyPolicy = () => {
+  const currentYear = new Date().getFullYear();
+  
   return (
     <Layout>
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Privacy Policy</h1>
           <p className="text-gray-600 mb-6">
-            Last Updated: May 20, 2023
+            Last Updated: {new Date().toLocaleDateString()}
           </p>
           
           <div className="prose prose-gray max-w-none">
@@ -79,12 +81,11 @@ const PrivacyPolicy = () => {
             </p>
             
             <h2 className="text-xl font-semibold mt-8 mb-4">Contact Us</h2>
-            <p>
-              If you have questions or concerns about this Privacy Policy or our privacy practices, please contact us at:
-            </p>
             <p className="mt-2">
-              <strong>Email:</strong> privacy@finace.example.com<br />
-              <strong>Address:</strong> 123 Financial District, Suite 500, San Francisco, CA 94111
+              For questions about our privacy practices, please contact us through our app's support channels.
+            </p>
+            <p className="mt-4 text-sm text-gray-500">
+              © {currentYear} FinAce. All rights reserved.
             </p>
           </div>
         </div>

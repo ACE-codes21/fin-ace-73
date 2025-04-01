@@ -1,113 +1,130 @@
-import React from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import ApiKeyInput from '@/components/chat/ApiKeyInput';
 import ChatContainer from '@/components/chat/ChatContainer';
 import ChatInput from '@/components/chat/ChatInput';
-import { SecurityInfo } from '@/components/chat/SecurityInfo';
-import ErrorBoundary from '@/components/chat/ErrorBoundary';
 import { ChatError } from '@/components/chat/ChatError';
-import { useApiKeys } from '@/hooks/useApiKeys';
-import { useChat } from '@/hooks/useChat';
-import Chat3DBackground from '@/components/effects/Chat3DBackground';
-import { motion } from 'framer-motion';
-import ParticlesBackground from '@/components/effects/ParticlesBackground';
-import { Bot } from 'lucide-react';
+import useChat from '@/hooks/useChat';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Shield } from 'lucide-react';
+import ErrorBoundary from '@/components/chat/ErrorBoundary';
+
 const Chat = () => {
-  const {
-    geminiApiKey,
-    setGeminiApiKey,
-    showApiKeyInput,
-    saveApiKey,
-    clearApiKey
-  } = useApiKeys();
   const {
     messages,
     inputMessage,
-    setInputMessage,
     isAITyping,
     isRateLimited,
-    errorMessage,
     apiKeyError,
-    chatContainerRef,
-    messagesEndRef,
+    geminiApiKey,
+    hasScrolledUp,
     handleSendMessage,
+    setInputMessage,
     handleKeyDown,
+    onFeedbackSubmit,
+    clearApiKey,
+    saveApiKey,
+    setGeminiApiKey,
     handleScroll,
-    onFeedbackSubmit
-  } = useChat({
-    geminiApiKey
-  });
-  return <Layout>
-      <ParticlesBackground />
-      <Chat3DBackground />
-      
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <motion.div initial={{
-        opacity: 0,
-        y: -20
-      }} animate={{
-        opacity: 1,
-        y: 0
-      }} transition={{
-        duration: 0.5
-      }}>
-          <div className="flex items-center justify-center mb-6">
-            <div className="bg-finance-primary p-2 rounded-full mr-3">
-              <Bot className="h-6 w-6 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold text-center">
-              <span className="bg-gradient-to-r from-finance-primary via-finance-accent to-finance-secondary bg-clip-text text-transparent">FinAce AI Chat</span>
-            </h1>
-          </div>
-        </motion.div>
+    messagesEndRef,
+    chatContainerRef,
+  } = useChat();
 
+  const navigate = useNavigate();
+
+  // Redirect to home if no API key after 3 seconds
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    
+    if (!geminiApiKey) {
+      timeoutId = setTimeout(() => {
+        // This would be where you'd redirect if needed
+        // navigate('/');
+      }, 3000);
+    }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [geminiApiKey, navigate]);
+
+  return (
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-finance-primary to-finance-accent bg-clip-text text-transparent">
+            FinAce AI Chat Assistant
+          </h1>
+          
           <ErrorBoundary>
-            <motion.div initial={{
-            opacity: 0,
-            y: 20
-          }} animate={{
-            opacity: 1,
-            y: 0
-          }} transition={{
-            delay: 0.1,
-            duration: 0.5
-          }}>
-              {showApiKeyInput && <ApiKeyInput geminiApiKey={geminiApiKey} setGeminiApiKey={setGeminiApiKey} saveApiKey={saveApiKey} apiKeyError={apiKeyError} />}
-            </motion.div>
+            {!geminiApiKey && (
+              <ApiKeyInput
+                geminiApiKey={geminiApiKey}
+                setGeminiApiKey={setGeminiApiKey}
+                saveApiKey={saveApiKey}
+                apiKeyError={apiKeyError}
+              />
+            )}
+            
+            {isRateLimited && (
+              <ChatError
+                title="Rate Limit Exceeded"
+                description="You've sent too many messages in a short period. Please wait a moment before sending more messages."
+                variant="rate-limit"
+              />
+            )}
+            
+            {geminiApiKey && apiKeyError && (
+              <ChatError
+                title="API Key Error"
+                description={apiKeyError.message}
+                variant="auth"
+                retryAction={clearApiKey}
+              />
+            )}
 
-            <motion.div initial={{
-            opacity: 0,
-            y: 20
-          }} animate={{
-            opacity: 1,
-            y: 0
-          }} transition={{
-            delay: 0.2,
-            duration: 0.5
-          }}>
-              {errorMessage && <ChatError title={apiKeyError?.status === 429 ? "API Rate Limit Exceeded" : "Error"} description={errorMessage} variant={apiKeyError?.status === 429 ? "rate-limit" : "general"} />}
-            </motion.div>
+            {geminiApiKey && !apiKeyError && (
+              <>
+                <Alert variant="default" className="mb-4 bg-finance-primary/5 border border-finance-primary/20">
+                  <Shield className="h-4 w-4 text-finance-primary" />
+                  <AlertDescription>
+                    Ask me anything about investing in the Indian market, financial planning, or managing your personal finances.
+                  </AlertDescription>
+                </Alert>
 
-            <motion.div initial={{
-            opacity: 0
-          }} animate={{
-            opacity: 1
-          }} transition={{
-            delay: 0.3,
-            duration: 0.5
-          }}>
-              <ChatContainer messages={messages} isAITyping={isAITyping} chatContainerRef={chatContainerRef} messagesEndRef={messagesEndRef} handleScroll={handleScroll} onFeedbackSubmit={onFeedbackSubmit} />
-            </motion.div>
+                <ChatContainer
+                  messages={messages}
+                  isAITyping={isAITyping}
+                  chatContainerRef={chatContainerRef}
+                  messagesEndRef={messagesEndRef}
+                  handleScroll={handleScroll}
+                  onFeedbackSubmit={onFeedbackSubmit}
+                />
 
-            <ChatInput inputMessage={inputMessage} setInputMessage={setInputMessage} handleSendMessage={handleSendMessage} isAITyping={isAITyping} isRateLimited={isRateLimited} clearApiKey={clearApiKey} handleKeyDown={handleKeyDown} />
+                <ChatInput
+                  inputMessage={inputMessage}
+                  setInputMessage={setInputMessage}
+                  handleSendMessage={handleSendMessage}
+                  isAITyping={isAITyping}
+                  isRateLimited={isRateLimited}
+                  clearApiKey={clearApiKey}
+                  handleKeyDown={handleKeyDown}
+                />
 
-            <div className="mt-4">
-              <SecurityInfo />
-            </div>
+                {hasScrolledUp && messages.length > 3 && (
+                  <div className="fixed bottom-24 right-1/2 transform translate-x-1/2 bg-finance-primary text-white px-4 py-2 rounded-full text-sm shadow-lg animate-bounce">
+                    New messages below
+                  </div>
+                )}
+              </>
+            )}
           </ErrorBoundary>
         </div>
       </div>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default Chat;

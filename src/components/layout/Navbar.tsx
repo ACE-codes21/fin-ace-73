@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, Menu } from 'lucide-react';
@@ -13,17 +13,34 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Navbar = () => {
   const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [scrolled]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
+      scrolled ? "bg-white/95 backdrop-blur-md shadow-md" : "bg-white/80 backdrop-blur-sm"
+    }`}>
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-finance-primary via-finance-accent to-finance-secondary rounded-md flex items-center justify-center text-white font-bold shadow-md transition-all duration-300 group-hover:scale-110">
+            <div className="w-10 h-10 bg-gradient-to-br from-finance-primary via-finance-accent to-finance-secondary rounded-lg flex items-center justify-center text-white font-bold shadow-md transition-all duration-300 group-hover:scale-110">
               FA
             </div>
             <span className="font-bold text-xl hidden sm:inline-block group-hover:text-finance-primary transition-colors duration-300">FinAce</span>
@@ -34,31 +51,19 @@ const Navbar = () => {
         <div className="hidden md:flex items-center space-x-6">
           <Link 
             to="/" 
-            className={`text-base transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-finance-primary ${
-              isActive('/') 
-                ? 'text-finance-primary font-medium after:w-full' 
-                : 'text-gray-700 hover:text-finance-primary after:w-0 hover:after:w-full after:transition-all'
-            }`}
+            className={`text-base nav-link ${isActive('/') ? 'nav-link-active' : ''}`}
           >
             Home
           </Link>
           <Link 
             to="/forecast" 
-            className={`text-base transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-finance-primary ${
-              isActive('/forecast') 
-                ? 'text-finance-primary font-medium after:w-full' 
-                : 'text-gray-700 hover:text-finance-primary after:w-0 hover:after:w-full after:transition-all'
-            }`}
+            className={`text-base nav-link ${isActive('/forecast') ? 'nav-link-active' : ''}`}
           >
             Forecast
           </Link>
           <Link 
             to="/risk-assessment" 
-            className={`text-base transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-finance-primary ${
-              isActive('/risk-assessment') 
-                ? 'text-finance-primary font-medium after:w-full' 
-                : 'text-gray-700 hover:text-finance-primary after:w-0 hover:after:w-full after:transition-all'
-            }`}
+            className={`text-base nav-link ${isActive('/risk-assessment') ? 'nav-link-active' : ''}`}
           >
             Risk Assessment
           </Link>
@@ -68,17 +73,17 @@ const Navbar = () => {
                 Resources <ChevronDown size={16} className="transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white animate-fade-in shadow-xl border border-gray-100" align="end">
-              <DropdownMenuItem className="transition-colors hover:bg-finance-primary/10">
+            <DropdownMenuContent className="w-56 bg-white animate-fade-in shadow-soft border border-gray-100 rounded-lg" align="end">
+              <DropdownMenuItem className="transition-colors hover:bg-finance-primary/10 rounded-md">
                 <Link to="/chat" className="w-full">FinAce AI Chat</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="transition-colors hover:bg-finance-primary/10">
+              <DropdownMenuItem className="transition-colors hover:bg-finance-primary/10 rounded-md">
                 <Link to="/investments" className="w-full">Investment Suggestions</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Link to="/chat">
-            <Button className="bg-finance-primary hover:bg-finance-primary/90 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg px-6">
+            <Button className="modern-button">
               Get Started
             </Button>
           </Link>
@@ -94,7 +99,7 @@ const Navbar = () => {
             </SheetTrigger>
             <SheetContent className="w-[250px] sm:w-[300px]">
               <div className="flex items-center gap-2 mb-8 mt-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-finance-primary via-finance-accent to-finance-secondary rounded-md flex items-center justify-center text-white font-bold">
+                <div className="w-8 h-8 bg-gradient-to-br from-finance-primary via-finance-accent to-finance-secondary rounded-lg flex items-center justify-center text-white font-bold">
                   FA
                 </div>
                 <span className="font-bold text-lg">FinAce</span>
@@ -130,8 +135,8 @@ const Navbar = () => {
                 >
                   Investment Suggestions
                 </Link>
-                <Link to="/chat">
-                  <Button className="w-full mt-4 bg-finance-primary hover:bg-finance-primary/90 transition-all duration-300">
+                <Link to="/chat" className="mt-4">
+                  <Button className="w-full modern-button">
                     Get Started
                   </Button>
                 </Link>

@@ -5,74 +5,48 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
-
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-
+    --popover-foreground: 222.2 84% 4.9%;
     --primary: 199 89% 48%;
     --primary-foreground: 210 40% 98%;
-
-    --secondary: 142 71% 45%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-
-    --accent: 262 58% 64%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 84% 60%;
+    --secondary: 160 84% 39%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 222 84% 5%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 210 40% 98%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 199 89% 48%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 210 40% 96%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 199 89% 48%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 199 89% 48%;
+    --radius: 0.75rem;
   }
-
+ 
   .dark {
-    --background: 222 47% 11%;
+    --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-
-    --card: 222 47% 11%;
+    --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-
-    --popover: 222 47% 11%;
+    --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
     --primary: 199 89% 48%;
-    --primary-foreground: 222 47% 11%;
-
-    --secondary: 142 71% 45%;
-    --secondary-foreground: 222 47% 11%;
-
-    --muted: 217 33% 18%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 262 58% 64%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 160 84% 39%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 262 83% 58%;
     --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 63% 31%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 212 27% 84%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 199 89% 48%;
   }
 }
 
@@ -80,130 +54,112 @@
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+  
+  html {
     scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
+  }
+  
+  h1 {
+    @apply text-4xl leading-tight lg:text-5xl;
+  }
+  
+  h2 {
+    @apply text-3xl leading-tight lg:text-4xl;
+  }
+  
+  h3 {
+    @apply text-2xl leading-tight;
   }
 }
 
 @layer components {
-  .gradient-text {
-    @apply bg-gradient-to-r from-finance-primary via-finance-accent to-finance-secondary bg-clip-text text-transparent;
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-card hover:-translate-y-1;
   }
   
-  .finance-card {
-    @apply bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300;
+  .glass-card {
+    @apply bg-white/90 backdrop-blur-md border border-white/40 shadow-soft;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-br from-finance-primary via-finance-accent to-finance-secondary bg-clip-text text-transparent;
   }
   
-  .input-field {
-    @apply px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-finance-primary;
+  .gradient-border {
+    @apply border border-transparent bg-gradient-to-br from-finance-primary to-finance-accent p-[1px] rounded-lg;
   }
   
-  /* Markdown styling */
-  .prose h1 {
-    @apply text-xl font-bold mt-4 mb-2;
+  .nav-link {
+    @apply relative transition-colors hover:text-finance-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-finance-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300;
   }
   
-  .prose h2 {
-    @apply text-lg font-bold mt-3 mb-2;
+  .nav-link-active {
+    @apply text-finance-primary after:scale-x-100;
   }
   
-  .prose h3 {
-    @apply text-base font-bold mt-3 mb-1;
+  .modern-input {
+    @apply bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-finance-primary/20 focus:border-finance-primary focus:outline-none transition-all;
   }
   
-  .prose ul {
-    @apply list-disc pl-5 my-2;
-  }
-  
-  .prose ol {
-    @apply list-decimal pl-5 my-2;
-  }
-  
-  .prose p {
-    @apply my-2;
-  }
-  
-  .prose code {
-    @apply bg-gray-100 px-1 py-0.5 rounded text-sm;
-  }
-  
-  .prose blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic my-2;
-  }
-  
-  .prose a {
-    @apply text-finance-primary hover:underline;
-  }
-  
-  .prose strong {
-    @apply font-bold;
-  }
-  
-  .prose em {
-    @apply italic;
-  }
-  
-  .prose table {
-    @apply border-collapse border border-gray-300 my-2;
-  }
-  
-  .prose th, .prose td {
-    @apply border border-gray-300 p-2;
-  }
-  
-  .prose img {
-    @apply max-w-full h-auto rounded my-2;
+  .modern-button {
+    @apply bg-finance-primary hover:bg-finance-primary/90 text-white font-medium rounded-lg px-6 py-3 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5;
   }
 }
 
-/* Animation keyframes */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 0 rgba(14, 165, 233, 0);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
-  }
-}
-
-/* Custom animations */
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
+    animation: fadeIn 0.6s ease-in-out forwards;
+    opacity: 0;
   }
-  
-  .animate-slide-in {
-    animation: slideIn 0.6s ease-out forwards;
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+    transform: translateY(20px);
+    opacity: 0;
   }
-  
-  .animate-pulse-glow {
-    animation: pulseGlow 2s infinite;
-  }
-  
+
   .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: pulseSlow 2s infinite;
+  }
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulseSlow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Prevent page jump when submitting in Chat */
+.chat-form-container {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 1rem 0;
+  z-index: 10;
+}
+
+/* Improve mobile experience */
+@media (max-width: 768px) {
+  .chat-message-container {
+    max-width: 90% !important;
   }
 }

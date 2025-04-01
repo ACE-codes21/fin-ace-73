@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Info, KeyIcon, ShieldCheck } from 'lucide-react';
+import { Info, KeyIcon } from 'lucide-react';
 import { GeminiErrorResponse } from '@/utils/gemini';
 import { motion } from 'framer-motion';
 
@@ -26,7 +26,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="mb-4 border border-gray-200 shadow-lg backdrop-blur-sm bg-white/80 overflow-hidden">
+      <Card className="mb-4 shadow-card border border-gray-100 bg-white overflow-hidden">
         <CardContent className="p-6">
           <motion.div 
             className="flex items-center mb-4"
@@ -35,7 +35,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
             transition={{ delay: 0.2 }}
           >
             <KeyIcon className="h-5 w-5 mr-2 text-finance-primary" />
-            <h2 className="text-lg font-semibold text-finance-primary">
+            <h2 className="text-lg font-semibold text-gray-800">
               Enter Your Gemini API Key
             </h2>
           </motion.div>
@@ -64,13 +64,12 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                   placeholder="Your Gemini API Key"
                   value={geminiApiKey}
                   onChange={(e) => setGeminiApiKey(e.target.value)}
-                  className="pr-10 border-finance-primary/20 focus:border-finance-primary focus:ring-2 focus:ring-finance-primary/20 shadow-inner"
+                  className="modern-input pr-10 shadow-inner"
                 />
-                <ShieldCheck className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               </div>
               <Button 
                 type="submit"
-                className="bg-finance-primary hover:bg-finance-primary/90 transition-colors"
+                className="modern-button"
               >
                 Save Key
               </Button>

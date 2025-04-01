@@ -2,7 +2,7 @@
 import React, { useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, Bot, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { User, Bot } from 'lucide-react';
 import { FeedbackRating } from "@/components/chat/FeedbackRating";
 import { Message } from '@/hooks/useChat';
 import { motion } from 'framer-motion';
@@ -54,12 +54,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
         <div className="flex-shrink-0 mx-2">
           {message.sender === 'user' ? (
             <Avatar className="h-10 w-10 border-2 border-finance-primary shadow-sm">
+              <AvatarImage src="/user-avatar.png" alt="User" />
               <AvatarFallback className="bg-finance-primary text-white">
                 <User className="h-5 w-5" />
               </AvatarFallback>
             </Avatar>
           ) : (
             <Avatar className="h-10 w-10 border-2 border-finance-accent shadow-sm">
+              <AvatarImage src="/bot-avatar.png" alt="FinAce" />
               <AvatarFallback className="bg-finance-accent text-white">
                 <Bot className="h-5 w-5" />
               </AvatarFallback>

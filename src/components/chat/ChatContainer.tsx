@@ -5,7 +5,7 @@ import { Message } from '@/hooks/useChat';
 import ChatMessage from './ChatMessage';
 import { Loader2, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ChatContainerProps {
   messages: Message[];
@@ -68,6 +68,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                     }}
                   >
                     <Avatar className="h-16 w-16 border-2 border-finance-accent shadow-md">
+                      <AvatarImage src="/bot-avatar.png" alt="FinAce" />
                       <AvatarFallback className="bg-finance-accent text-white text-xl">
                         <Bot className="h-8 w-8" />
                       </AvatarFallback>
@@ -102,6 +103,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                 <div className="flex">
                   <div className="flex-shrink-0 mr-2">
                     <Avatar className="h-10 w-10 border-2 border-finance-accent">
+                      <AvatarImage src="/bot-avatar.png" alt="FinAce" />
                       <AvatarFallback className="bg-finance-accent text-white">
                         <Bot className="h-5 w-5" />
                       </AvatarFallback>

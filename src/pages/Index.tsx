@@ -8,6 +8,7 @@ import StatsSection from '@/components/home/StatsSection';
 import CTASection from '@/components/home/CTASection';
 import { useInView } from 'react-intersection-observer';
 import ParticlesBackground from '@/components/effects/ParticlesBackground';
+import { motion } from 'framer-motion';
 
 const Index = () => {
   const [featuresRef, featuresInView] = useInView({ threshold: 0.2, triggerOnce: true });
@@ -17,40 +18,45 @@ const Index = () => {
   
   return (
     <Layout>
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden min-h-screen">
         <ParticlesBackground />
         
-        <div className="relative z-10">
+        <motion.div 
+          className="relative z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
           <HeroSection />
-        </div>
+        </motion.div>
         
-        <div 
+        <motion.div 
           ref={featuresRef} 
           className={`relative z-10 transition-all duration-1000 transform ${featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
           <FeaturesSection />
-        </div>
+        </motion.div>
         
-        <div 
+        <motion.div 
           ref={howItWorksRef} 
           className={`relative z-10 transition-all duration-1000 transform ${howItWorksInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
           <HowItWorksSection />
-        </div>
+        </motion.div>
         
-        <div 
+        <motion.div 
           ref={statsRef} 
           className={`relative z-10 transition-all duration-1000 transform ${statsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
           <StatsSection />
-        </div>
+        </motion.div>
         
-        <div 
+        <motion.div 
           ref={ctaRef} 
           className={`relative z-10 transition-all duration-1000 transform ${ctaInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
           <CTASection />
-        </div>
+        </motion.div>
       </div>
     </Layout>
   );

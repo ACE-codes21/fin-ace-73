@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Loader2, RefreshCcw, Rocket, Sparkles, PanelBottomClose } from 'lucide-react';
+import { Send, Loader2, RefreshCcw, Rocket, Sparkles } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -66,9 +66,14 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 type="button" 
                 size="icon" 
                 variant="outline"
-                className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500"
+                className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500 shadow-sm"
               >
-                <Sparkles className="h-4 w-4" />
+                <motion.div
+                  whileHover={{ rotate: 180 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Sparkles className="h-4 w-4" />
+                </motion.div>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0" align="start">
@@ -92,7 +97,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
             </PopoverContent>
           </Popover>
           
-          <div className="flex-grow relative">
+          <motion.div 
+            className="flex-grow relative"
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+          >
             <Input
               placeholder="Ask me about investing in the Indian market..."
               value={inputMessage}
@@ -110,23 +119,30 @@ const ChatInput: React.FC<ChatInputProps> = ({
               {isAITyping ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Send className="h-4 w-4" />
+                <motion.div
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Send className="h-4 w-4" />
+                </motion.div>
               )}
             </Button>
-          </div>
+          </motion.div>
           
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  onClick={clearApiKey} 
-                  size="icon"
-                  className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500 hover:text-red-500"
-                  type="button"
-                >
-                  <RefreshCcw className="h-4 w-4" />
-                </Button>
+                <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.3 }}>
+                  <Button 
+                    variant="outline" 
+                    onClick={clearApiKey} 
+                    size="icon"
+                    className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500 hover:text-red-500 shadow-sm"
+                    type="button"
+                  >
+                    <RefreshCcw className="h-4 w-4" />
+                  </Button>
+                </motion.div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Clear API Key & Reset Chat</p>

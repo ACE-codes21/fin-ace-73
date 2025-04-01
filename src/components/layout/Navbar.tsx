@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
-import { ChevronDown, Menu, Home } from 'lucide-react';
+import { ChevronDown, Menu } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -26,8 +26,7 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="text-gray-700 hover:text-finance-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:w-0 after:bg-finance-primary after:transition-all hover:after:w-full flex items-center gap-1">
-            <Home size={16} />
+          <Link to="/" className="text-gray-700 hover:text-finance-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:w-0 after:bg-finance-primary after:transition-all hover:after:w-full">
             <span>Home</span>
           </Link>
           <Link to="/forecast" className="text-gray-700 hover:text-finance-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:w-0 after:bg-finance-primary after:transition-all hover:after:w-full">
@@ -72,8 +71,7 @@ const Navbar = () => {
                 <span className="font-bold text-lg">FinAce</span>
               </div>
               <div className="flex flex-col space-y-4">
-                <Link to="/" className="text-lg font-medium py-2 hover:text-finance-primary transition-colors flex items-center gap-2">
-                  <Home size={18} />
+                <Link to="/" className="text-lg font-medium py-2 hover:text-finance-primary transition-colors">
                   Home
                 </Link>
                 <Link to="/forecast" className="text-lg font-medium py-2 hover:text-finance-primary transition-colors">

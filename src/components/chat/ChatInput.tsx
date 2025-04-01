@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Loader2, RefreshCcw, Rocket, Sparkles } from 'lucide-react';
+import { Send, Loader2, Sparkles } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -22,7 +22,6 @@ interface ChatInputProps {
   handleSendMessage: (e?: React.FormEvent) => void;
   isAITyping: boolean;
   isRateLimited: boolean;
-  clearApiKey: () => void;
   handleKeyDown: (e: React.KeyboardEvent) => void;
 }
 
@@ -41,7 +40,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
   handleSendMessage,
   isAITyping,
   isRateLimited,
-  clearApiKey,
   handleKeyDown,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -89,7 +87,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     className="w-full justify-start text-left text-sm mb-1 h-auto py-2"
                     onClick={() => handleQuickPromptSelect(prompt)}
                   >
-                    <Rocket className="h-3 w-3 mr-2 flex-shrink-0" />
+                    <Sparkles className="h-3 w-3 mr-2 flex-shrink-0" />
                     <span className="truncate">{prompt}</span>
                   </Button>
                 ))}
@@ -128,27 +126,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
               )}
             </Button>
           </motion.div>
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.3 }}>
-                  <Button 
-                    variant="outline" 
-                    onClick={clearApiKey} 
-                    size="icon"
-                    className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500 hover:text-red-500 shadow-sm"
-                    type="button"
-                  >
-                    <RefreshCcw className="h-4 w-4" />
-                  </Button>
-                </motion.div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Clear API Key & Reset Chat</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
       </form>
     </motion.div>

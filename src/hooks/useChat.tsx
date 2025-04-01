@@ -4,6 +4,10 @@ import { generateGeminiResponse, GeminiErrorResponse } from '@/utils/gemini';
 import { useChatScroll } from '@/hooks/useChatScroll';
 import { useToast } from "@/hooks/use-toast";
 
+// This is a hardcoded API key for demo purposes
+// In a real application, this would be stored on the server side
+const SERVER_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+
 export interface Message {
   id: number;
   text: string;
@@ -12,18 +16,13 @@ export interface Message {
   feedbackSubmitted?: boolean;
 }
 
-interface UseChatProps {
-  geminiApiKey?: string;
-}
-
-export const useChat = (props?: UseChatProps) => {
+export const useChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [apiKeyError, setApiKeyError] = useState<GeminiErrorResponse | null>(null);
-  const [geminiApiKey, setGeminiApiKey] = useState<string>('');
   const [hasScrolledUp, setHasScrolledUp] = useState(false);
   
   const { toast } = useToast();
@@ -36,14 +35,6 @@ export const useChat = (props?: UseChatProps) => {
   } = useChatScroll(messages);
   
   const currentMessageId = useRef(0);
-
-  // Load API key from localStorage on mount
-  useEffect(() => {
-    const storedApiKey = localStorage.getItem('geminiApiKey');
-    if (storedApiKey) {
-      setGeminiApiKey(storedApiKey);
-    }
-  }, []);
 
   // Track scroll position
   useEffect(() => {
@@ -67,37 +58,10 @@ export const useChat = (props?: UseChatProps) => {
     return currentMessageId.current;
   };
 
-  const saveApiKey = () => {
-    if (geminiApiKey.trim()) {
-      localStorage.setItem('geminiApiKey', geminiApiKey);
-      toast({
-        title: "API Key Saved",
-        description: "Your Gemini API key has been saved to your browser.",
-      });
-    }
-  };
-
-  const clearApiKey = () => {
-    localStorage.removeItem('geminiApiKey');
-    setGeminiApiKey('');
-    setMessages([]);
-    setApiKeyError(null);
-    toast({
-      title: "Reset Complete",
-      description: "Your API key has been cleared and chat history reset.",
-    });
-  };
-
   const generateResponse = async (userMessage: string) => {
     setIsAITyping(true);
     setErrorMessage(null);
     setApiKeyError(null);
-    
-    if (!geminiApiKey) {
-      setErrorMessage("Please provide a valid Gemini API key to use FinAce.");
-      setIsAITyping(false);
-      return null;
-    }
     
     try {
       // Convert messages to format expected by Gemini
@@ -112,7 +76,7 @@ export const useChat = (props?: UseChatProps) => {
         content: userMessage
       }];
       
-      const response = await generateGeminiResponse(geminiApiKey, fullMessageHistory);
+      const response = await generateGeminiResponse(SERVER_API_KEY, fullMessageHistory);
       
       if (response.error) {
         console.error("Gemini API Error:", response.error);
@@ -120,8 +84,8 @@ export const useChat = (props?: UseChatProps) => {
         setErrorMessage(response.error.message);
         
         toast({
-          title: "API Error",
-          description: response.error.message,
+          title: "AI Service Error",
+          description: "We're experiencing some issues with our AI service. Please try again later.",
           variant: "destructive",
         });
         
@@ -141,7 +105,7 @@ export const useChat = (props?: UseChatProps) => {
       
       toast({
         title: "Error",
-        description: errorMsg,
+        description: "We're experiencing some issues. Please try again later.",
         variant: "destructive",
       });
       
@@ -223,7 +187,6 @@ export const useChat = (props?: UseChatProps) => {
     isRateLimited,
     errorMessage,
     apiKeyError,
-    geminiApiKey,
     hasScrolledUp,
     chatContainerRef,
     messagesEndRef,
@@ -231,9 +194,6 @@ export const useChat = (props?: UseChatProps) => {
     setInputMessage,
     handleKeyDown,
     onFeedbackSubmit,
-    clearApiKey,
-    saveApiKey,
-    setGeminiApiKey,
     handleScroll,
   };
 };

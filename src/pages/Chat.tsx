@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import ApiKeyInput from '@/components/chat/ApiKeyInput';
 import ChatContainer from '@/components/chat/ChatContainer';
 import ChatInput from '@/components/chat/ChatInput';
 import { ChatError } from '@/components/chat/ChatError';
@@ -18,37 +17,17 @@ const Chat = () => {
     isAITyping,
     isRateLimited,
     apiKeyError,
-    geminiApiKey,
     hasScrolledUp,
     handleSendMessage,
     setInputMessage,
     handleKeyDown,
     onFeedbackSubmit,
-    clearApiKey,
-    saveApiKey,
-    setGeminiApiKey,
-    handleScroll,
     messagesEndRef,
     chatContainerRef,
+    handleScroll,
   } = useChat();
 
   const navigate = useNavigate();
-
-  // Redirect to home if no API key after 3 seconds
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    
-    if (!geminiApiKey) {
-      timeoutId = setTimeout(() => {
-        // This would be where you'd redirect if needed
-        // navigate('/');
-      }, 3000);
-    }
-    
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [geminiApiKey, navigate]);
 
   return (
     <Layout>
@@ -59,15 +38,6 @@ const Chat = () => {
           </h1>
           
           <ErrorBoundary>
-            {!geminiApiKey && (
-              <ApiKeyInput
-                geminiApiKey={geminiApiKey}
-                setGeminiApiKey={setGeminiApiKey}
-                saveApiKey={saveApiKey}
-                apiKeyError={apiKeyError}
-              />
-            )}
-            
             {isRateLimited && (
               <ChatError
                 title="Rate Limit Exceeded"
@@ -76,50 +46,46 @@ const Chat = () => {
               />
             )}
             
-            {geminiApiKey && apiKeyError && (
+            {apiKeyError && (
               <ChatError
-                title="API Key Error"
-                description={apiKeyError.message}
+                title="AI Service Error"
+                description="We're experiencing some issues with our AI service. Please try again later."
                 variant="auth"
-                retryAction={clearApiKey}
               />
             )}
 
-            {geminiApiKey && !apiKeyError && (
-              <>
-                <Alert variant="default" className="mb-4 bg-finance-primary/5 border border-finance-primary/20">
-                  <Shield className="h-4 w-4 text-finance-primary" />
-                  <AlertDescription>
-                    Ask me anything about investing in the Indian market, financial planning, or managing your personal finances.
-                  </AlertDescription>
-                </Alert>
+            <>
+              <Alert variant="default" className="mb-4 bg-finance-primary/5 border border-finance-primary/20">
+                <Shield className="h-4 w-4 text-finance-primary" />
+                <AlertDescription>
+                  Ask me anything about investing in the Indian market, financial planning, or managing your personal finances.
+                </AlertDescription>
+              </Alert>
 
-                <ChatContainer
-                  messages={messages}
-                  isAITyping={isAITyping}
-                  chatContainerRef={chatContainerRef}
-                  messagesEndRef={messagesEndRef}
-                  handleScroll={handleScroll}
-                  onFeedbackSubmit={onFeedbackSubmit}
-                />
+              <ChatContainer
+                messages={messages}
+                isAITyping={isAITyping}
+                chatContainerRef={chatContainerRef}
+                messagesEndRef={messagesEndRef}
+                handleScroll={handleScroll}
+                onFeedbackSubmit={onFeedbackSubmit}
+              />
 
-                <ChatInput
-                  inputMessage={inputMessage}
-                  setInputMessage={setInputMessage}
-                  handleSendMessage={handleSendMessage}
-                  isAITyping={isAITyping}
-                  isRateLimited={isRateLimited}
-                  clearApiKey={clearApiKey}
-                  handleKeyDown={handleKeyDown}
-                />
+              <ChatInput
+                inputMessage={inputMessage}
+                setInputMessage={setInputMessage}
+                handleSendMessage={handleSendMessage}
+                isAITyping={isAITyping}
+                isRateLimited={isRateLimited}
+                handleKeyDown={handleKeyDown}
+              />
 
-                {hasScrolledUp && messages.length > 3 && (
-                  <div className="fixed bottom-24 right-1/2 transform translate-x-1/2 bg-finance-primary text-white px-4 py-2 rounded-full text-sm shadow-lg animate-bounce">
-                    New messages below
-                  </div>
-                )}
-              </>
-            )}
+              {hasScrolledUp && messages.length > 3 && (
+                <div className="fixed bottom-24 right-1/2 transform translate-x-1/2 bg-finance-primary text-white px-4 py-2 rounded-full text-sm shadow-lg animate-bounce">
+                  New messages below
+                </div>
+              )}
+            </>
           </ErrorBoundary>
         </div>
       </div>

@@ -4,13 +4,20 @@ import Layout from '../components/layout/Layout';
 import { Separator } from '@/components/ui/separator';
 
 const TermsOfService = () => {
+  // Get current date in format like "June 15, 2024"
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Terms of Service</h1>
           <p className="text-gray-600 mb-6">
-            Last Updated: May 20, 2023
+            Last Updated: {currentDate}
           </p>
           
           <div className="prose prose-gray max-w-none">
@@ -99,8 +106,8 @@ const TermsOfService = () => {
               If you have any questions about these Terms, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Email:</strong> legal@finace.example.com<br />
-              <strong>Address:</strong> 123 Financial District, Suite 500, San Francisco, CA 94111
+              <strong>Email:</strong> support@finace.ai<br />
+              <strong>Address:</strong> Coming Soon
             </p>
           </div>
         </div>

@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, User, Bot, Info, XCircle, Loader2, RefreshCcw, Server, Clock } from 'lucide-react';
+import { Send, User, Bot, Info, XCircle, Loader2, Server } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from "@/hooks/use-toast";
 import { ChatError } from "@/components/chat/ChatError";
@@ -64,26 +64,24 @@ const Chat = () => {
   const [apiKeyError, setApiKeyError] = useState<{title?: string; message: string; variant?: 'rate-limit' | 'auth' | 'general'} | null>(null);
   const [activeTab, setActiveTab] = useState<string>("chat");
   const [rateLimitTimer, setRateLimitTimer] = useState<number>(0);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Improved scroll function that won't automatically scroll to bottom on every message
+  // Modified scroll function that respects user preference
   const scrollToBottom = (force: boolean = false) => {
     try {
-      // Only auto-scroll if we're near the bottom already or if forced
+      if (!autoScrollEnabled && !force) return;
+      
       if (messagesEndRef.current && chatContainerRef.current) {
+        // Only auto-scroll if we're already near the bottom or if it's a user message
         const container = chatContainerRef.current;
-        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 200;
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
         
         if (isNearBottom || force || messages[messages.length - 1]?.sender === 'user') {
-          // Use setTimeout to ensure DOM has updated
-          setTimeout(() => {
-            if (messagesEndRef.current) {
-              messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-          }, 100);
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
       }
     } catch (e) {
@@ -91,14 +89,38 @@ const Chat = () => {
     }
   };
 
+  // Track scroll position to determine if auto-scroll should be enabled
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const container = chatContainerRef.current;
+      const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+      
+      // If user scrolls up more than 200px, disable auto-scroll
+      if (distanceFromBottom > 200) {
+        setAutoScrollEnabled(false);
+      } else if (distanceFromBottom < 100) {
+        // If user scrolls to near bottom, re-enable auto-scroll
+        setAutoScrollEnabled(true);
+      }
+    }
+  };
+
   useEffect(() => {
     // Only auto-scroll when a new message is added
     if (messages.length > 0) {
-      // Auto-scroll when the user sends a message, but be smarter about AI responses
       const lastMessage = messages[messages.length - 1];
       scrollToBottom(lastMessage.sender === 'user');
     }
   }, [messages]);
+
+  useEffect(() => {
+    // Add scroll event listener
+    const container = chatContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
 
   useEffect(() => {
     if (isRateLimited) {
@@ -120,6 +142,16 @@ const Chat = () => {
 
   const saveApiKey = () => {
     if (apiKey.trim()) {
+      // Basic validation for API key format
+      if (!apiKey.startsWith('sk-') || apiKey.length < 20) {
+        toast({
+          title: "Invalid API Key Format",
+          description: "Please provide a valid OpenAI API key that starts with 'sk-'.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       try {
         localStorage.setItem('openai_api_key', apiKey);
         setShowApiKeyInput(false);
@@ -245,6 +277,7 @@ const Chat = () => {
     setMessages(prevMessages => [...prevMessages, userMessage]);
     setInputMessage('');
     setIsAITyping(true);
+    setApiKeyError(null); // Clear previous errors when sending a new message
     
     try {
       // Format the messages for the OpenAI API
@@ -282,15 +315,14 @@ const Chat = () => {
           setIsRateLimited(true);
         }
         
-        // Add error message as AI response
-        const errorResponse: Message = {
-          id: messages.length + 2,
-          text: `**Error: ${response.error.title || 'API Error'}**\n\n${response.error.message}\n\nPlease try again later or check your API key settings.`,
-          sender: 'ai',
-          timestamp: new Date(),
-        };
-        
-        setMessages(prevMessages => [...prevMessages, errorResponse]);
+        // Add error message as AI response but hide it from chat view
+        // We'll display it as a dedicated error component instead
+        // This prevents error messages from cluttering the chat history
+        toast({
+          title: response.error.title || "API Error",
+          description: response.error.message,
+          variant: "destructive",
+        });
       } else {
         // Clear any previous errors if the request was successful
         setApiKeyError(null);
@@ -307,14 +339,11 @@ const Chat = () => {
     } catch (error) {
       console.error('Error in AI response:', error);
       
-      const errorResponse: Message = {
-        id: messages.length + 2,
-        text: "I'm sorry, I encountered an error while processing your request. Please try again later.",
-        sender: 'ai',
-        timestamp: new Date(),
-      };
-      
-      setMessages(prevMessages => [...prevMessages, errorResponse]);
+      toast({
+        title: "Connection Error",
+        description: "Could not connect to the AI service. Please check your internet connection and try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsAITyping(false);
     }
@@ -327,14 +356,14 @@ const Chat = () => {
           <Tabs defaultValue="chat" value={activeTab} onValueChange={setActiveTab}>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
               <div>
-                <h1 className="text-xl md:text-2xl font-bold text-finance-primary">FinAce Assistant</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-finance-primary">FinAce AI</h1>
                 <p className="text-sm text-gray-500 mt-1">Your AI-powered Indian financial markets advisor</p>
               </div>
               
               <TabsList className="grid grid-cols-2 w-full md:w-auto">
                 <TabsTrigger value="chat" className="text-xs md:text-sm">
                   <Bot className="h-4 w-4 mr-1 md:mr-2" />
-                  <span className="hidden md:inline">Assistant</span>
+                  <span className="hidden md:inline">FinAce AI</span>
                   <span className="md:hidden">AI</span>
                 </TabsTrigger>
                 <TabsTrigger value="market" className="text-xs md:text-sm">
@@ -346,23 +375,6 @@ const Chat = () => {
             </div>
 
             <TabsContent value="chat" className="mt-0">
-              {isRateLimited && (
-                <ChatError
-                  title={`Rate Limit Exceeded (${rateLimitTimer}s)`}
-                  description="You've hit OpenAI's rate limit. Please wait before sending another message."
-                  retryAction={retryAfterRateLimit}
-                  variant="rate-limit"
-                />
-              )}
-              
-              {apiKeyError && !showApiKeyInput && (
-                <ChatError
-                  title={apiKeyError.title || "API Error"}
-                  description={apiKeyError.message}
-                  variant={apiKeyError.variant}
-                />
-              )}
-              
               {showApiKeyInput ? (
                 <Card className="mb-4 border border-gray-200 animate-fade-in shadow-md">
                   <CardContent className="p-6">
@@ -403,11 +415,29 @@ const Chat = () => {
                 <>
                   <div className="grid grid-cols-1 gap-6">
                     <div>
+                      {apiKeyError && (
+                        <ChatError
+                          title={apiKeyError.title || "API Error"}
+                          description={apiKeyError.message}
+                          variant={apiKeyError.variant}
+                        />
+                      )}
+                      
+                      {isRateLimited && (
+                        <ChatError
+                          title={`Rate Limit Exceeded (${rateLimitTimer}s)`}
+                          description="You've hit OpenAI's rate limit. Please wait before sending another message."
+                          retryAction={retryAfterRateLimit}
+                          variant="rate-limit"
+                        />
+                      )}
+                      
                       <Card className="mb-4 border border-gray-200 shadow-md overflow-hidden">
                         <CardContent className="p-0">
                           <div 
                             ref={chatContainerRef}
                             className="h-[calc(100vh-300px)] md:h-[600px] overflow-y-auto p-4 space-y-4"
+                            onScroll={handleScroll}
                           >
                             {messages.map((message) => (
                               <div

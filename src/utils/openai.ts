@@ -21,6 +21,18 @@ export async function fetchOpenAIResponse(
   messages: OpenAIMessage[]
 ): Promise<OpenAIResponse> {
   try {
+    // Validate API key format before making request
+    if (!apiKey || !apiKey.startsWith('sk-') || apiKey.length < 20) {
+      return {
+        text: '',
+        error: {
+          title: 'Invalid API Key Format',
+          message: 'Please provide a valid OpenAI API key that starts with "sk-".',
+          variant: 'auth',
+        },
+      };
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -47,7 +59,7 @@ export async function fetchOpenAIResponse(
           text: '',
           error: {
             title: 'Rate Limit Exceeded',
-            message: 'You have sent too many requests. Please wait for 60 seconds before trying again.',
+            message: 'OpenAI\'s servers are experiencing high traffic. Please try again in a few minutes or use a different API key.',
             status: 429,
             variant: 'rate-limit',
           },
@@ -60,7 +72,7 @@ export async function fetchOpenAIResponse(
           text: '',
           error: {
             title: 'Invalid API Key',
-            message: 'Your OpenAI API key is invalid. Please check and try again.',
+            message: 'Your OpenAI API key is invalid or has expired. Please check and try again with a new key.',
             status: 401,
             variant: 'auth',
           },
@@ -73,7 +85,7 @@ export async function fetchOpenAIResponse(
           text: '',
           error: {
             title: 'API Quota Exceeded',
-            message: 'Your OpenAI API quota has been exceeded. Please check your billing details.',
+            message: 'Your OpenAI API quota has been exceeded. Please check your billing details or try a different API key.',
             status: 429,
             variant: 'rate-limit',
           },
@@ -84,8 +96,8 @@ export async function fetchOpenAIResponse(
       return {
         text: '',
         error: {
-          title: 'API Error',
-          message: errorData.error?.message || 'An error occurred while connecting to OpenAI',
+          title: 'Connection Issue',
+          message: errorData.error?.message || 'An error occurred while connecting to OpenAI. Please try again later.',
           status: response.status,
           variant: 'general',
         },

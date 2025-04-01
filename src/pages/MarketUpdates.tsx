@@ -115,9 +115,7 @@ const MarketUpdates = () => {
               <p className="text-gray-600 mb-4">{update.summary}</p>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">{update.date}</span>
-                <Button variant="link" className="text-finance-primary hover:underline text-sm font-medium p-0">
-                  Read full analysis
-                </Button>
+                {/* "Read full analysis" button removed as requested */}
               </div>
             </div>
           ))}

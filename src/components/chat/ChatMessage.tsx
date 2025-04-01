@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, Bot } from 'lucide-react';
+import { User, Bot, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { FeedbackRating } from "@/components/chat/FeedbackRating";
 import { Message } from '@/hooks/useChat';
+import { motion } from 'framer-motion';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ChatMessageProps {
   message: Message;
@@ -12,28 +14,64 @@ interface ChatMessageProps {
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) => {
+  const messageRef = useRef<HTMLDivElement>(null);
+  
+  // Animation variants
+  const containerVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: message.sender === 'user' ? 20 : -20 
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        type: "spring", 
+        stiffness: 500, 
+        damping: 40,
+        mass: 1
+      }
+    }
+  };
+  
+  // Auto-scroll when message appears
+  useEffect(() => {
+    if (messageRef.current) {
+      messageRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
   return (
-    <div
+    <motion.div
+      ref={messageRef}
       key={message.id}
-      className={`flex mb-4 ${message.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
+      className={`flex mb-6 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
     >
-      <div className={`flex max-w-[85%] md:max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
-        <div className={`flex items-center justify-center h-10 w-10 rounded-full flex-shrink-0 ${
-          message.sender === 'user' 
-            ? 'bg-finance-primary ml-2 shadow-md' 
-            : 'bg-finance-accent mr-2 shadow-md'
-        }`}>
+      <div className={`flex max-w-[85%] md:max-w-[75%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
+        <div className="flex-shrink-0 mx-2">
           {message.sender === 'user' ? (
-            <User className="h-5 w-5 text-white" />
+            <Avatar className="h-10 w-10 border-2 border-finance-primary shadow-sm">
+              <AvatarFallback className="bg-finance-primary text-white">
+                <User className="h-5 w-5" />
+              </AvatarFallback>
+            </Avatar>
           ) : (
-            <Bot className="h-5 w-5 text-white" />
+            <Avatar className="h-10 w-10 border-2 border-finance-accent shadow-sm">
+              <AvatarFallback className="bg-finance-accent text-white">
+                <Bot className="h-5 w-5" />
+              </AvatarFallback>
+            </Avatar>
           )}
         </div>
+        
         <div
-          className={`p-4 rounded-lg shadow-sm ${
+          className={`p-4 rounded-2xl shadow-md ${
             message.sender === 'user'
-              ? 'bg-finance-primary text-white'
-              : 'bg-gray-100 text-gray-800'
+              ? 'bg-gradient-to-br from-finance-primary to-finance-primary/80 text-white'
+              : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 border border-gray-100'
           }`}
         >
           {message.sender === 'user' ? (
@@ -47,10 +85,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
               </div>
               
               {message.sender === 'ai' && !message.feedbackSubmitted && (
-                <FeedbackRating 
-                  messageId={message.id} 
-                  onFeedbackSubmit={onFeedbackSubmit}
-                />
+                <div className="mt-3 pt-2 border-t border-gray-200">
+                  <FeedbackRating 
+                    messageId={message.id} 
+                    onFeedbackSubmit={onFeedbackSubmit}
+                  />
+                </div>
               )}
             </>
           )}
@@ -61,7 +101,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

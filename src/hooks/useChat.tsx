@@ -1,6 +1,8 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { generateGeminiResponse, GeminiErrorResponse } from '@/utils/gemini';
+import { useChatScroll } from '@/hooks/useChatScroll';
+import { useToast } from "@/hooks/use-toast";
 
 export interface Message {
   id: number;
@@ -22,22 +24,20 @@ export const useChat = ({ geminiApiKey }: UseChatProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [apiKeyError, setApiKeyError] = useState<GeminiErrorResponse | null>(null);
   
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  
+  const { 
+    chatContainerRef,
+    messagesEndRef,
+    scrollToBottom,
+    handleScroll
+  } = useChatScroll(messages);
   
   const currentMessageId = useRef(0);
 
   const getNextMessageId = () => {
     currentMessageId.current += 1;
     return currentMessageId.current;
-  };
-
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-
-  const handleScroll = () => {
-    // Custom scroll handler can be implemented if needed
   };
 
   const generateResponse = async (userMessage: string) => {
@@ -71,6 +71,12 @@ export const useChat = ({ geminiApiKey }: UseChatProps) => {
         setApiKeyError(response.error);
         setErrorMessage(response.error.message);
         
+        toast({
+          title: "API Error",
+          description: response.error.message,
+          variant: "destructive",
+        });
+        
         if (response.error.status === 429) {
           setIsRateLimited(true);
           setTimeout(() => setIsRateLimited(false), 60000); // Reset after 1 minute
@@ -82,7 +88,15 @@ export const useChat = ({ geminiApiKey }: UseChatProps) => {
       return response.text;
     } catch (error) {
       console.error("Error generating response:", error);
-      setErrorMessage(error instanceof Error ? error.message : "An error occurred");
+      const errorMsg = error instanceof Error ? error.message : "An error occurred";
+      setErrorMessage(errorMsg);
+      
+      toast({
+        title: "Error",
+        description: errorMsg,
+        variant: "destructive",
+      });
+      
       return null;
     } finally {
       setIsAITyping(false);
@@ -110,6 +124,7 @@ export const useChat = ({ geminiApiKey }: UseChatProps) => {
     };
     
     setMessages(prev => [...prev, newUserMessage]);
+    scrollToBottom(true);
     
     // Generate and add AI response
     const aiResponse = await generateResponse(userMessage);
@@ -123,6 +138,7 @@ export const useChat = ({ geminiApiKey }: UseChatProps) => {
       };
       
       setMessages(prev => [...prev, newAIMessage]);
+      scrollToBottom(true);
     }
   };
 
@@ -142,6 +158,11 @@ export const useChat = ({ geminiApiKey }: UseChatProps) => {
           : message
       )
     );
+    
+    toast({
+      title: "Thank you for your feedback!",
+      description: rating > 3 ? "We're glad you found this response helpful." : "We'll work on improving our responses.",
+    });
     
     // In a real application, you would send this feedback to a server
     console.log(`Feedback submitted for message ${messageId}: Rating ${rating}, Feedback: "${feedback}"`);

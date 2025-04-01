@@ -3,26 +3,31 @@ import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 
 export const useApiKeys = () => {
-  const [geminiApiKey, setGeminiApiKey] = useState(() => {
-    try {
-      return localStorage.getItem('gemini_api_key') || '';
-    } catch (e) {
-      console.error("Error reading from localStorage:", e);
-      return '';
-    }
-  });
-  
-  const [showApiKeyInput, setShowApiKeyInput] = useState(() => {
-    try {
-      return !localStorage.getItem('gemini_api_key');
-    } catch (e) {
-      console.error("Error reading from localStorage:", e);
-      return true;
-    }
-  });
-
+  const [geminiApiKey, setGeminiApiKey] = useState<string>('');
+  const [showApiKeyInput, setShowApiKeyInput] = useState(true);
   const { toast } = useToast();
 
+  // Load API key from localStorage on component mount
+  useEffect(() => {
+    try {
+      const savedKey = localStorage.getItem('gemini_api_key');
+      if (savedKey) {
+        setGeminiApiKey(savedKey);
+        setShowApiKeyInput(false);
+      } else {
+        setShowApiKeyInput(true);
+      }
+    } catch (e) {
+      console.error("Error reading from localStorage:", e);
+      toast({
+        title: "Storage Error",
+        description: "Could not access local storage. Please check your browser settings.",
+        variant: "destructive",
+      });
+      setShowApiKeyInput(true);
+    }
+  }, [toast]);
+  
   const saveApiKey = () => {
     if (!geminiApiKey.trim()) {
       toast({
@@ -59,7 +64,7 @@ export const useApiKeys = () => {
       setShowApiKeyInput(true);
       toast({
         title: "API Key Cleared",
-        description: "Your API key has been removed from local storage.",
+        description: "Your API key has been removed from local storage and chat history cleared.",
       });
     } catch (e) {
       console.error("Error clearing localStorage:", e);

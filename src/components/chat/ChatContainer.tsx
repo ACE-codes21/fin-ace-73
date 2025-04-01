@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Message } from '@/hooks/useChat';
+import { Message } from '@/types/chat';
 import ChatMessage from './ChatMessage';
 import { Loader2, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -1,6 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import Layout from '@/components/layout/Layout';
 import ChatContainer from '@/components/chat/ChatContainer';
 import ChatInput from '@/components/chat/ChatInput';
@@ -26,8 +25,6 @@ const Chat = () => {
     chatContainerRef,
     handleScroll,
   } = useChat();
-
-  const navigate = useNavigate();
 
   return (
     <Layout>

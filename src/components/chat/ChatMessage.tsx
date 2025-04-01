@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { User, Bot } from 'lucide-react';
 import { FeedbackRating } from "@/components/chat/FeedbackRating";
-import { Message } from '@/hooks/useChat';
+import { Message } from '@/types/chat';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 

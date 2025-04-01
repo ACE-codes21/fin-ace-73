@@ -1,9 +1,8 @@
 
 import { GeminiErrorResponse, GeminiResponse } from '@/types/chat';
 
-// This is a hardcoded API key for demo purposes
-// In a real application, this would be stored on the server side
-const SERVER_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+// Server-side API key for production use
+const SERVER_API_KEY = "AIzaSyDYH3gyvcbAu1qwuF2TG1NV-IGBc_3W58w";
 
 export async function generateGeminiResponse(
   messages: { role: string; content: string }[]

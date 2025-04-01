@@ -1,6 +1,6 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { Message } from './useChat';
+import { Message } from '@/types/chat';
 
 export const useChatScroll = (messages: Message[]) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);

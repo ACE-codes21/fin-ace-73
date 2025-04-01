@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, User, Bot, Info, XCircle, Loader2, Server, RotateCcw } from 'lucide-react';
+import { Send, User, Bot, Info, Loader2, Server, RotateCcw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from "@/hooks/use-toast";
 import { ChatError } from "@/components/chat/ChatError";
@@ -38,7 +38,7 @@ import {
 } from '@/utils/openai';
 import { fetchGeminiResponse } from '@/utils/gemini';
 
-interface Message {
+export interface Message {
   id: number;
   text: string;
   sender: 'user' | 'ai';
@@ -429,7 +429,7 @@ const Chat = () => {
         description: response.error.message,
         variant: "destructive",
       });
-    } else {
+    } else if (response.text) {
       // Clear any previous errors if the request was successful
       setApiKeyError(null);
       
@@ -472,7 +472,7 @@ const Chat = () => {
           description: response.error.message,
           variant: "destructive",
         });
-      } else {
+      } else if (response.text) {
         // Clear any previous errors if the request was successful
         setApiKeyError(null);
         
@@ -748,53 +748,41 @@ const Chat = () => {
                               onChange={handleInputChange}
                               onKeyDown={handleKeyDown}
                               className="flex-grow input-field shadow-sm focus:shadow-md transition-shadow"
-                              disabled={isRateLimited || isAITyping}
+                              disabled={isAITyping || isRateLimited}
                             />
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div>
-                                    <Button 
-                                      type="submit"
-                                      className="bg-finance-primary hover:bg-finance-primary/90 shadow-sm transition-all"
-                                      disabled={inputMessage.trim() === '' || isAITyping || isRateLimited}
-                                    >
-                                      {isAITyping ? (
-                                        <Loader2 className="h-5 w-5 animate-spin" />
-                                      ) : (
-                                        <Send className="h-5 w-5" />
-                                      )}
-                                    </Button>
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Send message</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                            <Button 
+                              type="submit" 
+                              className="bg-finance-primary hover:bg-finance-primary/90 transition-all duration-300"
+                              disabled={isAITyping || isRateLimited || inputMessage.trim() === ''}
+                            >
+                              {isAITyping ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                              ) : (
+                                <Send className="h-5 w-5" />
+                              )}
+                            </Button>
                             
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <div>
-                                    <Button 
-                                      type="button"
-                                      variant="outline"
-                                      onClick={clearApiKey}
-                                      className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600 transition-colors"
-                                    >
-                                      <XCircle className="h-5 w-5" />
-                                    </Button>
-                                  </div>
+                                  <Button 
+                                    variant="outline" 
+                                    onClick={clearApiKey} 
+                                    className="text-gray-500 hover:text-red-500"
+                                    type="button"
+                                  >
+                                    <Info className="h-5 w-5" />
+                                  </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Reset API Key</p>
+                                  <p>Clear API Key</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
                           </form>
-                          <div className="mt-2 text-xs text-gray-500 text-right">
-                            Using {selectedModel === 'openai' ? 'OpenAI' : 'Google Gemini'} API
+                          
+                          <div className="text-xs text-gray-500 text-center mt-2">
+                            Your API key is stored locally and never sent to our servers.
                           </div>
                         </div>
                       </div>
@@ -804,9 +792,7 @@ const Chat = () => {
               </TabsContent>
               
               <TabsContent value="market">
-                <div className="space-y-6">
-                  <RealTimeMarketData />
-                </div>
+                <RealTimeMarketData />
               </TabsContent>
             </Tabs>
           </div>

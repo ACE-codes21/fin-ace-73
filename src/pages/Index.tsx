@@ -56,45 +56,53 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.1s" }}>
-              <div className="w-12 h-12 bg-finance-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Brain className="h-6 w-6 text-finance-primary" />
+            <Link to="/chat" className="group">
+              <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.1s" }}>
+                <div className="w-12 h-12 bg-finance-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Brain className="h-6 w-6 text-finance-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">AI Chat Assistant</h3>
+                <p className="text-gray-600">
+                  Get answers to your financial questions from our AI assistant trained on Indian finance.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-3">AI Chat Assistant</h3>
-              <p className="text-gray-600">
-                Get answers to your financial questions from our AI assistant trained on Indian finance.
-              </p>
-            </div>
+            </Link>
 
-            <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              <div className="w-12 h-12 bg-finance-secondary/10 rounded-lg flex items-center justify-center mb-4">
-                <LineChart className="h-6 w-6 text-finance-secondary" />
+            <Link to="/forecast" className="group">
+              <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.2s" }}>
+                <div className="w-12 h-12 bg-finance-secondary/10 rounded-lg flex items-center justify-center mb-4">
+                  <LineChart className="h-6 w-6 text-finance-secondary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Financial Forecasting</h3>
+                <p className="text-gray-600">
+                  Visualize your future savings and investment growth based on your financial inputs.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Financial Forecasting</h3>
-              <p className="text-gray-600">
-                Visualize your future savings and investment growth based on your financial inputs.
-              </p>
-            </div>
+            </Link>
 
-            <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.3s" }}>
-              <div className="w-12 h-12 bg-finance-accent/10 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-finance-accent" />
+            <Link to="/risk-assessment" className="group">
+              <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.3s" }}>
+                <div className="w-12 h-12 bg-finance-accent/10 rounded-lg flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6 text-finance-accent" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Risk Assessment</h3>
+                <p className="text-gray-600">
+                  Understand your risk tolerance and get personalized investment strategy recommendations.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Risk Assessment</h3>
-              <p className="text-gray-600">
-                Understand your risk tolerance and get personalized investment strategy recommendations.
-              </p>
-            </div>
+            </Link>
 
-            <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.4s" }}>
-              <div className="w-12 h-12 bg-finance-warning/10 rounded-lg flex items-center justify-center mb-4">
-                <BarChart3 className="h-6 w-6 text-finance-warning" />
+            <Link to="/investments" className="group">
+              <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.4s" }}>
+                <div className="w-12 h-12 bg-finance-warning/10 rounded-lg flex items-center justify-center mb-4">
+                  <BarChart3 className="h-6 w-6 text-finance-warning" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Investment Suggestions</h3>
+                <p className="text-gray-600">
+                  Receive tailored investment category recommendations based on your profile.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Investment Suggestions</h3>
-              <p className="text-gray-600">
-                Receive tailored investment category recommendations based on your profile.
-              </p>
-            </div>
+            </Link>
           </div>
         </div>
       </section>

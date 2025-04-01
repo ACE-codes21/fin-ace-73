@@ -87,7 +87,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-gray-400 text-center">
-          <p>© 2023 FinAce. All rights reserved.</p>
+          <p>© 2025 FinAce. All rights reserved.</p>
           <p className="mt-2">FinAce is a financial guidance platform created for educational purposes.</p>
         </div>
       </div>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, Menu } from 'lucide-react';
 import { 
   DropdownMenu,
@@ -12,9 +12,15 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Navbar = () => {
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="w-10 h-10 bg-gradient-to-br from-finance-primary via-finance-accent to-finance-secondary rounded-md flex items-center justify-center text-white font-bold shadow-md transition-all duration-300 group-hover:scale-110">
@@ -26,13 +32,34 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="text-gray-700 hover:text-finance-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:w-0 after:bg-finance-primary after:transition-all hover:after:w-full">
-            <span>Home</span>
+          <Link 
+            to="/" 
+            className={`text-base transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-finance-primary ${
+              isActive('/') 
+                ? 'text-finance-primary font-medium after:w-full' 
+                : 'text-gray-700 hover:text-finance-primary after:w-0 hover:after:w-full after:transition-all'
+            }`}
+          >
+            Home
           </Link>
-          <Link to="/forecast" className="text-gray-700 hover:text-finance-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:w-0 after:bg-finance-primary after:transition-all hover:after:w-full">
+          <Link 
+            to="/forecast" 
+            className={`text-base transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-finance-primary ${
+              isActive('/forecast') 
+                ? 'text-finance-primary font-medium after:w-full' 
+                : 'text-gray-700 hover:text-finance-primary after:w-0 hover:after:w-full after:transition-all'
+            }`}
+          >
             Forecast
           </Link>
-          <Link to="/risk-assessment" className="text-gray-700 hover:text-finance-primary transition-colors relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:w-0 after:bg-finance-primary after:transition-all hover:after:w-full">
+          <Link 
+            to="/risk-assessment" 
+            className={`text-base transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-finance-primary ${
+              isActive('/risk-assessment') 
+                ? 'text-finance-primary font-medium after:w-full' 
+                : 'text-gray-700 hover:text-finance-primary after:w-0 hover:after:w-full after:transition-all'
+            }`}
+          >
             Risk Assessment
           </Link>
           <DropdownMenu>
@@ -41,7 +68,7 @@ const Navbar = () => {
                 Resources <ChevronDown size={16} className="transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white animate-fade-in" align="end">
+            <DropdownMenuContent className="w-56 bg-white animate-fade-in shadow-xl border border-gray-100" align="end">
               <DropdownMenuItem className="transition-colors hover:bg-finance-primary/10">
                 <Link to="/chat" className="w-full">FinAce AI Chat</Link>
               </DropdownMenuItem>
@@ -51,7 +78,9 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           <Link to="/chat">
-            <Button className="bg-finance-primary hover:bg-finance-primary/90 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg">Get Started</Button>
+            <Button className="bg-finance-primary hover:bg-finance-primary/90 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg px-6">
+              Get Started
+            </Button>
           </Link>
         </div>
 
@@ -71,19 +100,34 @@ const Navbar = () => {
                 <span className="font-bold text-lg">FinAce</span>
               </div>
               <div className="flex flex-col space-y-4">
-                <Link to="/" className="text-lg font-medium py-2 hover:text-finance-primary transition-colors">
+                <Link 
+                  to="/" 
+                  className={`text-lg font-medium py-2 ${isActive('/') ? 'text-finance-primary' : 'text-gray-700 hover:text-finance-primary'} transition-colors`}
+                >
                   Home
                 </Link>
-                <Link to="/forecast" className="text-lg font-medium py-2 hover:text-finance-primary transition-colors">
+                <Link 
+                  to="/forecast" 
+                  className={`text-lg font-medium py-2 ${isActive('/forecast') ? 'text-finance-primary' : 'text-gray-700 hover:text-finance-primary'} transition-colors`}
+                >
                   Forecast
                 </Link>
-                <Link to="/risk-assessment" className="text-lg font-medium py-2 hover:text-finance-primary transition-colors">
+                <Link 
+                  to="/risk-assessment" 
+                  className={`text-lg font-medium py-2 ${isActive('/risk-assessment') ? 'text-finance-primary' : 'text-gray-700 hover:text-finance-primary'} transition-colors`}
+                >
                   Risk Assessment
                 </Link>
-                <Link to="/chat" className="text-lg font-medium py-2 hover:text-finance-primary transition-colors">
+                <Link 
+                  to="/chat" 
+                  className={`text-lg font-medium py-2 ${isActive('/chat') ? 'text-finance-primary' : 'text-gray-700 hover:text-finance-primary'} transition-colors`}
+                >
                   FinAce AI Chat
                 </Link>
-                <Link to="/investments" className="text-lg font-medium py-2 hover:text-finance-primary transition-colors">
+                <Link 
+                  to="/investments" 
+                  className={`text-lg font-medium py-2 ${isActive('/investments') ? 'text-finance-primary' : 'text-gray-700 hover:text-finance-primary'} transition-colors`}
+                >
                   Investment Suggestions
                 </Link>
                 <Link to="/chat">

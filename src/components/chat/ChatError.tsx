@@ -8,32 +8,36 @@ interface ChatErrorProps {
   description: string;
   retryAction?: () => void;
   variant?: "rate-limit" | "auth" | "general";
+  icon?: React.ReactNode;
+  className?: string;
 }
 
 export const ChatError = ({ 
   title, 
   description, 
   retryAction, 
-  variant = "general" 
+  variant = "general",
+  icon,
+  className = ""
 }: ChatErrorProps) => {
   return (
     <Alert 
       className={`mb-4 animate-fade-in border-l-4 shadow-md ${
         variant === "rate-limit" 
-          ? "border-amber-500 bg-amber-50 dark:bg-amber-950/10" 
+          ? "border-amber-500 bg-amber-50/80 dark:bg-amber-950/10" 
           : variant === "auth" 
-          ? "border-blue-500 bg-blue-50 dark:bg-blue-950/10"
+          ? "border-blue-500 bg-blue-50/80 dark:bg-blue-950/10"
           : "border-destructive bg-destructive/5"
-      }`}
+      } ${className}`}
     >
       <div className="flex items-start">
-        {variant === "rate-limit" ? (
+        {icon || (variant === "rate-limit" ? (
           <AlertCircle className="h-5 w-5 mr-2 text-amber-600" />
         ) : variant === "auth" ? (
           <ShieldAlert className="h-5 w-5 mr-2 text-blue-600" />
         ) : (
           <AlertCircle className="h-5 w-5 mr-2 text-destructive" />
-        )}
+        ))}
         <div className="flex-1">
           <AlertTitle className="font-semibold text-base">{title}</AlertTitle>
           <AlertDescription className="mt-2 text-sm">

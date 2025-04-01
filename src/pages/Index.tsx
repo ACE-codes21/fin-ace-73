@@ -9,7 +9,7 @@ const Index = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="pt-16 pb-20 md:pt-20 md:pb-28">
+      <section className="pt-16 pb-20 md:pt-20 md:pb-28 bg-gradient-to-b from-white to-sky-50">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 md:pr-12 animate-fade-in">
@@ -56,8 +56,8 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Link to="/chat" className="group">
-              <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.1s" }}>
+              <Link to="/chat" className="block h-full">
                 <div className="w-12 h-12 bg-finance-primary/10 rounded-lg flex items-center justify-center mb-4">
                   <Brain className="h-6 w-6 text-finance-primary" />
                 </div>
@@ -65,11 +65,11 @@ const Index = () => {
                 <p className="text-gray-600">
                   Get answers to your financial questions from our AI assistant trained on Indian finance.
                 </p>
-              </div>
-            </Link>
+              </Link>
+            </div>
 
-            <Link to="/forecast" className="group">
-              <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.2s" }}>
+              <Link to="/forecast" className="block h-full">
                 <div className="w-12 h-12 bg-finance-secondary/10 rounded-lg flex items-center justify-center mb-4">
                   <LineChart className="h-6 w-6 text-finance-secondary" />
                 </div>
@@ -77,11 +77,11 @@ const Index = () => {
                 <p className="text-gray-600">
                   Visualize your future savings and investment growth based on your financial inputs.
                 </p>
-              </div>
-            </Link>
+              </Link>
+            </div>
 
-            <Link to="/risk-assessment" className="group">
-              <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.3s" }}>
+              <Link to="/risk-assessment" className="block h-full">
                 <div className="w-12 h-12 bg-finance-accent/10 rounded-lg flex items-center justify-center mb-4">
                   <Shield className="h-6 w-6 text-finance-accent" />
                 </div>
@@ -89,11 +89,11 @@ const Index = () => {
                 <p className="text-gray-600">
                   Understand your risk tolerance and get personalized investment strategy recommendations.
                 </p>
-              </div>
-            </Link>
+              </Link>
+            </div>
 
-            <Link to="/investments" className="group">
-              <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.4s" }}>
+            <div className="finance-card p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.4s" }}>
+              <Link to="/investments" className="block h-full">
                 <div className="w-12 h-12 bg-finance-warning/10 rounded-lg flex items-center justify-center mb-4">
                   <BarChart3 className="h-6 w-6 text-finance-warning" />
                 </div>
@@ -101,14 +101,14 @@ const Index = () => {
                 <p className="text-gray-600">
                   Receive tailored investment category recommendations based on your profile.
                 </p>
-              </div>
-            </Link>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-3xl font-bold mb-4">How It Works</h2>
@@ -117,21 +117,23 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center transform transition-all duration-300 hover:translate-y-[-8px] animate-fade-in" style={{ animationDelay: "0.1s" }}>
-              <div className="w-16 h-16 bg-finance-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="text-center transform transition-all duration-300 hover:translate-y-[-8px] animate-fade-in relative" style={{ animationDelay: "0.1s" }}>
+              <div className="w-20 h-20 bg-finance-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
                 <span className="text-2xl font-bold text-finance-primary">1</span>
               </div>
+              <div className="absolute top-10 left-full w-24 h-0.5 bg-gradient-to-r from-finance-primary to-transparent hidden md:block" style={{ transform: "translateX(-50%)" }}></div>
               <h3 className="text-xl font-semibold mb-3">Share Your Goals</h3>
               <p className="text-gray-600">
                 Tell us about your income, expenses, and financial aspirations.
               </p>
             </div>
 
-            <div className="text-center transform transition-all duration-300 hover:translate-y-[-8px] animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              <div className="w-16 h-16 bg-finance-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
+            <div className="text-center transform transition-all duration-300 hover:translate-y-[-8px] animate-fade-in relative" style={{ animationDelay: "0.2s" }}>
+              <div className="w-20 h-20 bg-finance-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
                 <span className="text-2xl font-bold text-finance-secondary">2</span>
               </div>
+              <div className="absolute top-10 left-full w-24 h-0.5 bg-gradient-to-r from-finance-secondary to-transparent hidden md:block" style={{ transform: "translateX(-50%)" }}></div>
               <h3 className="text-xl font-semibold mb-3">Get AI Analysis</h3>
               <p className="text-gray-600">
                 Our AI analyzes your situation and provides personalized insights.
@@ -139,7 +141,7 @@ const Index = () => {
             </div>
 
             <div className="text-center transform transition-all duration-300 hover:translate-y-[-8px] animate-fade-in" style={{ animationDelay: "0.3s" }}>
-              <div className="w-16 h-16 bg-finance-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
+              <div className="w-20 h-20 bg-finance-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
                 <span className="text-2xl font-bold text-finance-accent">3</span>
               </div>
               <h3 className="text-xl font-semibold mb-3">Take Action</h3>
@@ -151,31 +153,31 @@ const Index = () => {
         </div>
       </section>
 
-      {/* New Stats Section */}
+      {/* Stats Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl shadow-md p-8 text-center transform transition-all duration-300 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.1s" }}>
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-finance-primary/10 rounded-full mb-4">
-                <TrendingUp className="h-6 w-6 text-finance-primary" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-finance-primary/10 rounded-full mb-4">
+                <TrendingUp className="h-8 w-8 text-finance-primary" />
               </div>
-              <h3 className="text-3xl font-bold mb-2">94%</h3>
+              <h3 className="text-4xl font-bold mb-2 text-gray-800">94%</h3>
               <p className="text-gray-600">Users reporting improved financial decisions</p>
             </div>
             
             <div className="bg-white rounded-xl shadow-md p-8 text-center transform transition-all duration-300 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-finance-secondary/10 rounded-full mb-4">
-                <PiggyBank className="h-6 w-6 text-finance-secondary" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-finance-secondary/10 rounded-full mb-4">
+                <PiggyBank className="h-8 w-8 text-finance-secondary" />
               </div>
-              <h3 className="text-3xl font-bold mb-2">₹25L+</h3>
+              <h3 className="text-4xl font-bold mb-2 text-gray-800">₹25L+</h3>
               <p className="text-gray-600">Average wealth growth by our premium users</p>
             </div>
             
             <div className="bg-white rounded-xl shadow-md p-8 text-center transform transition-all duration-300 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.3s" }}>
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-finance-accent/10 rounded-full mb-4">
-                <Wallet className="h-6 w-6 text-finance-accent" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-finance-accent/10 rounded-full mb-4">
+                <Wallet className="h-8 w-8 text-finance-accent" />
               </div>
-              <h3 className="text-3xl font-bold mb-2">10,000+</h3>
+              <h3 className="text-4xl font-bold mb-2 text-gray-800">10,000+</h3>
               <p className="text-gray-600">Financial plans created and optimized</p>
             </div>
           </div>
@@ -191,7 +193,7 @@ const Index = () => {
               Get started today with our AI-powered financial guidance platform. No complicated jargon, just clear advice.
             </p>
             <Link to="/chat">
-              <Button className="bg-white text-finance-primary hover:bg-gray-100 px-8 py-6 text-lg transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              <Button className="bg-white text-finance-primary hover:bg-gray-100 px-8 py-6 text-lg font-medium transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
                 Start Your Financial Journey
               </Button>
             </Link>

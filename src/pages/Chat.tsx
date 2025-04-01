@@ -6,7 +6,7 @@ import ApiKeyInput from '@/components/chat/ApiKeyInput';
 import ChatContainer from '@/components/chat/ChatContainer';
 import ChatInput from '@/components/chat/ChatInput';
 import { ChatError } from '@/components/chat/ChatError';
-import useChat from '@/hooks/useChat';
+import { useChat } from '@/hooks/useChat';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield } from 'lucide-react';
 import ErrorBoundary from '@/components/chat/ErrorBoundary';

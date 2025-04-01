@@ -13,16 +13,18 @@ export interface Message {
 }
 
 interface UseChatProps {
-  geminiApiKey: string;
+  geminiApiKey?: string;
 }
 
-export const useChat = ({ geminiApiKey }: UseChatProps) => {
+export const useChat = (props?: UseChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [apiKeyError, setApiKeyError] = useState<GeminiErrorResponse | null>(null);
+  const [geminiApiKey, setGeminiApiKey] = useState<string>('');
+  const [hasScrolledUp, setHasScrolledUp] = useState(false);
   
   const { toast } = useToast();
   
@@ -35,9 +37,55 @@ export const useChat = ({ geminiApiKey }: UseChatProps) => {
   
   const currentMessageId = useRef(0);
 
+  // Load API key from localStorage on mount
+  useEffect(() => {
+    const storedApiKey = localStorage.getItem('geminiApiKey');
+    if (storedApiKey) {
+      setGeminiApiKey(storedApiKey);
+    }
+  }, []);
+
+  // Track scroll position
+  useEffect(() => {
+    const handleScrollEvent = () => {
+      if (chatContainerRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+        const isScrolledUp = scrollHeight - scrollTop - clientHeight > 100;
+        setHasScrolledUp(isScrolledUp && messages.length > 3);
+      }
+    };
+
+    const container = chatContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScrollEvent);
+      return () => container.removeEventListener('scroll', handleScrollEvent);
+    }
+  }, [messages.length]);
+
   const getNextMessageId = () => {
     currentMessageId.current += 1;
     return currentMessageId.current;
+  };
+
+  const saveApiKey = () => {
+    if (geminiApiKey.trim()) {
+      localStorage.setItem('geminiApiKey', geminiApiKey);
+      toast({
+        title: "API Key Saved",
+        description: "Your Gemini API key has been saved to your browser.",
+      });
+    }
+  };
+
+  const clearApiKey = () => {
+    localStorage.removeItem('geminiApiKey');
+    setGeminiApiKey('');
+    setMessages([]);
+    setApiKeyError(null);
+    toast({
+      title: "Reset Complete",
+      description: "Your API key has been cleared and chat history reset.",
+    });
   };
 
   const generateResponse = async (userMessage: string) => {
@@ -168,23 +216,24 @@ export const useChat = ({ geminiApiKey }: UseChatProps) => {
     console.log(`Feedback submitted for message ${messageId}: Rating ${rating}, Feedback: "${feedback}"`);
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
-
   return {
     messages,
     inputMessage,
-    setInputMessage,
     isAITyping,
     isRateLimited,
     errorMessage,
     apiKeyError,
+    geminiApiKey,
+    hasScrolledUp,
     chatContainerRef,
     messagesEndRef,
     handleSendMessage,
+    setInputMessage,
     handleKeyDown,
+    onFeedbackSubmit,
+    clearApiKey,
+    saveApiKey,
+    setGeminiApiKey,
     handleScroll,
-    onFeedbackSubmit
   };
 };

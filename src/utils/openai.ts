@@ -4,99 +4,107 @@ export interface OpenAIMessage {
   content: string;
 }
 
-export interface OpenAIResponse {
-  text: string;
-  error?: {
-    status?: number;
-    message: string;
-    title?: string;
-    variant?: 'rate-limit' | 'auth' | 'general';
-  };
+export interface OpenAIErrorResponse {
+  title?: string;
+  message: string;
+  status?: number;
+  variant?: 'rate-limit' | 'auth' | 'general';
 }
 
-export const fetchOpenAIResponse = async (
+export interface OpenAIResponse {
+  text: string;
+  error?: OpenAIErrorResponse;
+}
+
+export async function fetchOpenAIResponse(
   apiKey: string,
   messages: OpenAIMessage[]
-): Promise<OpenAIResponse> => {
+): Promise<OpenAIResponse> {
   try {
-    if (!apiKey || apiKey.trim() === '') {
-      return {
-        text: "Please provide a valid OpenAI API key.",
-        error: {
-          title: "API Key Missing",
-          message: "You need to provide an OpenAI API key to continue.",
-          variant: "auth"
-        }
-      };
-    }
-
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
         messages,
         temperature: 0.7,
-        max_tokens: 800
-      })
+        max_tokens: 800,
+      }),
     });
 
-    // Handle API errors
+    // Handle HTTP errors
     if (!response.ok) {
-      const status = response.status;
-      
-      if (status === 429 || status === 403) {
-        console.log("Rate limit exceeded, status:", status);
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+
+      // Handle rate limiting errors
+      if (response.status === 429) {
+        console.info('Rate limit exceeded, status:', response.status);
         return {
-          text: "I'm currently experiencing high demand. Please wait a minute before sending another message.",
+          text: '',
           error: {
-            status,
-            title: "Rate Limit Exceeded",
-            message: "You've reached OpenAI's rate limit. Please wait about a minute before trying again or check your plan limits.",
-            variant: "rate-limit"
-          }
+            title: 'Rate Limit Exceeded',
+            message: 'You have sent too many requests. Please wait for 60 seconds before trying again.',
+            status: 429,
+            variant: 'rate-limit',
+          },
+        };
+      }
+
+      // Handle authentication errors
+      if (response.status === 401) {
+        return {
+          text: '',
+          error: {
+            title: 'Invalid API Key',
+            message: 'Your OpenAI API key is invalid. Please check and try again.',
+            status: 401,
+            variant: 'auth',
+          },
         };
       }
       
-      if (status === 401) {
-        console.log("Authentication failed, status:", status);
+      // Handle quota exceeded errors
+      if (response.status === 429 && errorData.error?.type === 'insufficient_quota') {
         return {
-          text: "Authentication failed. Please verify your API key.",
+          text: '',
           error: {
-            status,
-            title: "API Key Invalid",
-            message: "Your OpenAI API key appears to be invalid or expired. Please check and re-enter your key.",
-            variant: "auth"
-          }
+            title: 'API Quota Exceeded',
+            message: 'Your OpenAI API quota has been exceeded. Please check your billing details.',
+            status: 429,
+            variant: 'rate-limit',
+          },
         };
       }
-      
-      console.log("General API error, status:", status);
+
+      // Generic error
       return {
-        text: `Connection error. Status: ${status}. Please try again later.`,
+        text: '',
         error: {
-          status,
-          title: "Connection Error",
-          message: `Error ${status}: ${response.statusText}. Please try again in a moment.`,
-          variant: "general"
-        }
+          title: 'API Error',
+          message: errorData.error?.message || 'An error occurred while connecting to OpenAI',
+          status: response.status,
+          variant: 'general',
+        },
       };
     }
 
     const data = await response.json();
-    return { text: data.choices[0].message.content };
-  } catch (error) {
-    console.error('Error in OpenAI API request:', error);
     return {
-      text: "An unexpected error occurred. Please try again later.",
+      text: data.choices[0].message.content,
+    };
+  } catch (error) {
+    console.error('Error connecting to OpenAI:', error);
+    return {
+      text: '',
       error: {
-        message: error instanceof Error ? error.message : "Unknown error",
-        title: "Unexpected Error",
-        variant: "general"
-      }
+        title: 'Connection Error',
+        message: 'Could not connect to OpenAI. Please check your internet connection and try again.',
+        variant: 'general',
+      },
     };
   }
-};
+}

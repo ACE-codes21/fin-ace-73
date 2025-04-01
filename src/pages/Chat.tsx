@@ -5,13 +5,12 @@ import remarkGfm from 'remark-gfm';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, User, Bot, Info, XCircle, Loader2, RefreshCcw, Lock, Shield, Server } from 'lucide-react';
+import { Send, User, Bot, Info, XCircle, Loader2, RefreshCcw, Lock, Shield, Server, Clock } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from "@/hooks/use-toast";
 import { ChatError } from "@/components/chat/ChatError";
 import { SecurityInfo } from "@/components/chat/SecurityInfo";
 import { FeedbackRating } from "@/components/chat/FeedbackRating";
-import { FinanceQuest } from "@/components/gamification/FinanceQuest";
 import { RealTimeMarketData } from "@/components/market/RealTimeMarketData";
 import {
   Tooltip,
@@ -65,6 +64,7 @@ const Chat = () => {
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [apiKeyError, setApiKeyError] = useState<{title?: string; message: string; variant?: 'rate-limit' | 'auth' | 'general'} | null>(null);
   const [activeTab, setActiveTab] = useState<string>("chat");
+  const [rateLimitTimer, setRateLimitTimer] = useState<number>(0);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -89,11 +89,19 @@ const Chat = () => {
 
   useEffect(() => {
     if (isRateLimited) {
-      const timer = setTimeout(() => {
-        setIsRateLimited(false);
-      }, 60000);
+      setRateLimitTimer(60);
+      const interval = setInterval(() => {
+        setRateLimitTimer(prev => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setIsRateLimited(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
       
-      return () => clearTimeout(timer);
+      return () => clearInterval(interval);
     }
   }, [isRateLimited]);
 
@@ -208,7 +216,7 @@ const Chat = () => {
     if (isRateLimited) {
       toast({
         title: "Rate Limit Exceeded",
-        description: "Please wait a minute before sending another message.",
+        description: `Please wait ${rateLimitTimer} seconds before sending another message.`,
         variant: "destructive",
       });
       return;
@@ -260,19 +268,29 @@ const Chat = () => {
         if (response.error.status === 429 || response.error.status === 403) {
           setIsRateLimited(true);
         }
+        
+        // Add error message as AI response
+        const errorResponse: Message = {
+          id: messages.length + 2,
+          text: `**Error: ${response.error.title || 'API Error'}**\n\n${response.error.message}\n\nPlease try again later or check your API key settings.`,
+          sender: 'ai',
+          timestamp: new Date(),
+        };
+        
+        setMessages(prevMessages => [...prevMessages, errorResponse]);
       } else {
         // Clear any previous errors if the request was successful
         setApiKeyError(null);
+        
+        const aiResponse: Message = {
+          id: messages.length + 2,
+          text: response.text,
+          sender: 'ai',
+          timestamp: new Date(),
+        };
+        
+        setMessages(prevMessages => [...prevMessages, aiResponse]);
       }
-      
-      const aiResponse: Message = {
-        id: messages.length + 2,
-        text: response.text,
-        sender: 'ai',
-        timestamp: new Date(),
-      };
-      
-      setMessages(prevMessages => [...prevMessages, aiResponse]);
     } catch (error) {
       console.error('Error in AI response:', error);
       
@@ -300,7 +318,7 @@ const Chat = () => {
                 <p className="text-sm text-gray-500 mt-1">Your AI-powered Indian financial markets advisor</p>
               </div>
               
-              <TabsList className="grid grid-cols-3 w-full md:w-auto">
+              <TabsList className="grid grid-cols-2 w-full md:w-auto">
                 <TabsTrigger value="chat" className="text-xs md:text-sm">
                   <Bot className="h-4 w-4 mr-1 md:mr-2" />
                   <span className="hidden md:inline">Assistant</span>
@@ -311,19 +329,14 @@ const Chat = () => {
                   <span className="hidden md:inline">Market Data</span>
                   <span className="md:hidden">Market</span>
                 </TabsTrigger>
-                <TabsTrigger value="quests" className="text-xs md:text-sm">
-                  <Shield className="h-4 w-4 mr-1 md:mr-2" />
-                  <span className="hidden md:inline">Finance Quests</span>
-                  <span className="md:hidden">Quests</span>
-                </TabsTrigger>
               </TabsList>
             </div>
 
             <TabsContent value="chat" className="mt-0">
               {isRateLimited && (
                 <ChatError
-                  title="Rate Limit Exceeded"
-                  description="You've hit OpenAI's rate limit. Please wait a minute before sending another message."
+                  title={`Rate Limit Exceeded (${rateLimitTimer}s)`}
+                  description="You've hit OpenAI's rate limit. Please wait before sending another message."
                   retryAction={retryAfterRateLimit}
                   variant="rate-limit"
                 />
@@ -519,9 +532,17 @@ const Chat = () => {
                     
                     <div className="lg:col-span-1 space-y-6">
                       <SecurityInfo />
-                      <div className="hidden lg:block">
-                        <FinanceQuest />
-                      </div>
+                      <Card className="border rounded-lg shadow-sm overflow-hidden">
+                        <CardContent className="p-4">
+                          <div className="flex items-center mb-3">
+                            <Clock className="h-5 w-5 mr-2 text-amber-500" />
+                            <h3 className="font-semibold">Coming Soon</h3>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            The Finance Quests feature has been temporarily removed and will return in a future update with improved functionality.
+                          </p>
+                        </CardContent>
+                      </Card>
                     </div>
                   </div>
                 </>
@@ -531,12 +552,6 @@ const Chat = () => {
             <TabsContent value="market">
               <div className="space-y-6">
                 <RealTimeMarketData />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="quests">
-              <div className="space-y-6">
-                <FinanceQuest />
               </div>
             </TabsContent>
           </Tabs>

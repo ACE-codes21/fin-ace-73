@@ -50,18 +50,18 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
       animate="visible"
       variants={containerVariants}
     >
-      <div className={`flex max-w-[85%] md:max-w-[75%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
+      <div className={`flex max-w-[90%] sm:max-w-[80%] md:max-w-[70%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
         <div className="flex-shrink-0 mx-2">
           {message.sender === 'user' ? (
-            <Avatar className="h-10 w-10 border-2 border-finance-primary shadow-sm">
+            <Avatar className="h-9 w-9 border-2 border-finance-primary shadow-sm">
               <AvatarImage src="/user-avatar.png" alt="User" />
               <AvatarFallback className="bg-finance-primary text-white">
                 <User className="h-5 w-5" />
               </AvatarFallback>
             </Avatar>
           ) : (
-            <Avatar className="h-10 w-10 border-2 border-finance-accent shadow-sm">
-              <AvatarImage src="/bot-avatar.png" alt="FinAce" />
+            <Avatar className="h-9 w-9 border-2 border-finance-accent shadow-sm overflow-hidden">
+              <AvatarImage src="/bot-avatar.png" alt="FinAce" className="object-cover" />
               <AvatarFallback className="bg-finance-accent text-white">
                 <Bot className="h-5 w-5" />
               </AvatarFallback>
@@ -70,17 +70,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
         </div>
         
         <div
-          className={`p-4 rounded-2xl shadow-md ${
+          className={`p-3 md:p-4 rounded-2xl shadow-md ${
             message.sender === 'user'
               ? 'bg-gradient-to-br from-finance-primary to-finance-primary/80 text-white'
-              : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 border border-gray-100'
+              : 'bg-gradient-to-br from-white to-gray-50 text-gray-800 border border-gray-100'
           }`}
         >
           {message.sender === 'user' ? (
-            <p style={{ whiteSpace: 'pre-wrap' }}>{message.text}</p>
+            <p style={{ whiteSpace: 'pre-wrap' }} className="text-sm md:text-base">{message.text}</p>
           ) : (
             <>
-              <div className="prose prose-sm max-w-none dark:prose-invert">
+              <div className="prose prose-sm max-w-none dark:prose-invert text-sm md:text-base">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {message.text}
                 </ReactMarkdown>

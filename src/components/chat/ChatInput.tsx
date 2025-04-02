@@ -51,7 +51,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <motion.div 
-      className="chat-form-container"
+      className="chat-form-container pb-2 sm:pb-4 px-2 sm:px-0"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
@@ -64,7 +64,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 type="button" 
                 size="icon" 
                 variant="outline"
-                className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500 shadow-sm"
+                className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500 shadow-sm h-10 w-10 flex-shrink-0"
               >
                 <motion.div
                   whileHover={{ rotate: 180 }}
@@ -74,7 +74,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 </motion.div>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-0" align="start">
+            <PopoverContent className="w-64 sm:w-80 p-0" align="start">
               <div className="p-3 border-b border-gray-100">
                 <h3 className="text-sm font-medium">Quick Prompts</h3>
                 <p className="text-xs text-gray-500">Select a prompt to get started</p>
@@ -101,27 +101,27 @@ const ChatInput: React.FC<ChatInputProps> = ({
             transition={{ duration: 0.2 }}
           >
             <Input
-              placeholder="Ask me about investing in the Indian market..."
+              placeholder="Ask about investing..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="py-6 pl-4 pr-12 rounded-full input-field shadow-sm hover:shadow-md transition-shadow bg-white/80 backdrop-blur-sm border-gray-200"
+              className="py-5 sm:py-6 pl-3 sm:pl-4 pr-10 sm:pr-12 rounded-full input-field shadow-sm hover:shadow-md transition-shadow bg-white/80 backdrop-blur-sm border-gray-200 text-sm sm:text-base"
               disabled={isAITyping || isRateLimited}
             />
             <Button 
               type="submit" 
               size="icon"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-finance-primary hover:bg-finance-primary/90 transition-all duration-300 h-8 w-8"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-finance-primary hover:bg-finance-primary/90 transition-all duration-300 h-7 w-7 sm:h-8 sm:w-8"
               disabled={isAITyping || isRateLimited || inputMessage.trim() === ''}
             >
               {isAITyping ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
               ) : (
                 <motion.div
                   whileHover={{ scale: 1.2 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-3 w-3 sm:h-4 sm:w-4" />
                 </motion.div>
               )}
             </Button>

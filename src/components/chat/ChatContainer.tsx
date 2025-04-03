@@ -40,6 +40,9 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
     return () => clearInterval(interval);
   }, [chatContainerRef]);
 
+  // Use the current timestamp to bust cache
+  const timestamp = new Date().getTime();
+
   return (
     <Card className="mb-4 border border-gray-100 rounded-xl shadow-lg overflow-hidden backdrop-blur-sm bg-white/60">
       <CardContent className="p-0">
@@ -68,7 +71,11 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                     }}
                   >
                     <Avatar className="h-16 w-16 border-2 border-finance-accent shadow-md overflow-hidden">
-                      <AvatarImage src="/bot-avatar.png" alt="FinAce" className="object-cover" key="bot-avatar-2" />
+                      <AvatarImage 
+                        src={`/bot-avatar.png?v=${timestamp}`} 
+                        alt="FinAce" 
+                        className="object-cover" 
+                      />
                       <AvatarFallback className="bg-finance-accent text-white text-xl">
                         <Bot className="h-8 w-8" />
                       </AvatarFallback>
@@ -103,7 +110,11 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                 <div className="flex max-w-[70%]">
                   <div className="flex-shrink-0 mr-2">
                     <Avatar className="h-9 w-9 border-2 border-finance-accent overflow-hidden">
-                      <AvatarImage src="/bot-avatar.png" alt="FinAce" className="object-cover" key="bot-avatar-3" />
+                      <AvatarImage 
+                        src={`/bot-avatar.png?v=${timestamp}`} 
+                        alt="FinAce" 
+                        className="object-cover" 
+                      />
                       <AvatarFallback className="bg-finance-accent text-white">
                         <Bot className="h-5 w-5" />
                       </AvatarFallback>

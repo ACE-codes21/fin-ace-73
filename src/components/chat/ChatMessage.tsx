@@ -61,7 +61,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
             </Avatar>
           ) : (
             <Avatar className="h-9 w-9 border-2 border-finance-accent shadow-sm overflow-hidden">
-              <AvatarImage src="/bot-avatar.png" alt="FinAce" className="object-cover" />
+              <AvatarImage src="/bot-avatar.png" alt="FinAce" className="object-cover" key="bot-avatar-1" />
               <AvatarFallback className="bg-finance-accent text-white">
                 <Bot className="h-5 w-5" />
               </AvatarFallback>

@@ -51,28 +51,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
       variants={containerVariants}
     >
       <div className={`flex max-w-[90%] sm:max-w-[80%] md:max-w-[70%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
-        <div className="flex-shrink-0 mx-2">
-          {message.sender === 'user' ? (
-            <Avatar className="h-9 w-9 border-2 border-finance-primary shadow-sm">
-              <AvatarImage src="/user-avatar.png" alt="User" />
-              <AvatarFallback className="bg-finance-primary text-white">
-                <User className="h-5 w-5" />
-              </AvatarFallback>
-            </Avatar>
-          ) : (
-            <Avatar className="h-9 w-9 border-2 border-finance-accent shadow-sm overflow-hidden">
-              <AvatarImage 
-                src={`/bot-avatar.png?v=${new Date().getTime()}`} 
-                alt="FinAce" 
-                className="object-cover" 
-              />
-              <AvatarFallback className="bg-finance-accent text-white">
-                <Bot className="h-5 w-5" />
-              </AvatarFallback>
-            </Avatar>
-          )}
-        </div>
-        
         <div
           className={`p-3 md:p-4 rounded-2xl shadow-md ${
             message.sender === 'user'

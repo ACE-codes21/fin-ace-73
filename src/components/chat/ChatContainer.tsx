@@ -5,7 +5,6 @@ import { Message } from '@/types/chat';
 import ChatMessage from './ChatMessage';
 import { Loader2, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ChatContainerProps {
   messages: Message[];
@@ -40,9 +39,6 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
     return () => clearInterval(interval);
   }, [chatContainerRef]);
 
-  // Use the current timestamp to bust cache
-  const timestamp = new Date().getTime();
-
   return (
     <Card className="mb-4 border border-gray-100 rounded-xl shadow-lg overflow-hidden backdrop-blur-sm bg-white/60">
       <CardContent className="p-0">
@@ -59,30 +55,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                 transition={{ duration: 0.5 }}
                 className="text-center p-4 sm:p-6 rounded-xl bg-gradient-to-br from-gray-50/70 to-gray-100/70 shadow-sm border border-gray-100 max-w-[95%] sm:max-w-md mx-auto"
               >
-                <div className="flex justify-center mb-4">
-                  <motion.div 
-                    animate={{ 
-                      y: [0, -10, 0],
-                    }}
-                    transition={{ 
-                      repeat: Infinity, 
-                      duration: 2,
-                      ease: "easeInOut" 
-                    }}
-                  >
-                    <Avatar className="h-16 w-16 border-2 border-finance-accent shadow-md overflow-hidden">
-                      <AvatarImage 
-                        src={`/bot-avatar.png?v=${timestamp}`} 
-                        alt="FinAce" 
-                        className="object-cover" 
-                      />
-                      <AvatarFallback className="bg-finance-accent text-white text-xl">
-                        <Bot className="h-8 w-8" />
-                      </AvatarFallback>
-                    </Avatar>
-                  </motion.div>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Welcome to FinAce AI</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Welcome to AI Chat</h3>
                 <p className="text-gray-600 text-sm sm:text-base">
                   Ask me questions about investing in the Indian market, financial planning, 
                   or anything related to personal finance.
@@ -108,18 +81,6 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                 className="flex mb-4 justify-start"
               >
                 <div className="flex max-w-[70%]">
-                  <div className="flex-shrink-0 mr-2">
-                    <Avatar className="h-9 w-9 border-2 border-finance-accent overflow-hidden">
-                      <AvatarImage 
-                        src={`/bot-avatar.png?v=${timestamp}`} 
-                        alt="FinAce" 
-                        className="object-cover" 
-                      />
-                      <AvatarFallback className="bg-finance-accent text-white">
-                        <Bot className="h-5 w-5" />
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
                   <div className="p-3 rounded-2xl bg-gray-50 text-gray-800 shadow-sm border border-gray-100">
                     <div className="flex space-x-2 items-center">
                       <div className="flex space-x-2">

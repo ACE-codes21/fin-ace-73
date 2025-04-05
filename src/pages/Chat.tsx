@@ -31,7 +31,7 @@ const Chat = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-finance-primary to-finance-accent bg-clip-text text-transparent">
-            AI Chat
+            FinAce AI Chat
           </h1>
           
           <ErrorBoundary>

@@ -14,6 +14,7 @@ export const useChat = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [apiKeyError, setApiKeyError] = useState<GeminiErrorResponse | null>(null);
   const [hasScrolledUp, setHasScrolledUp] = useState(false);
+  const [fileUploads, setFileUploads] = useState<File[]>([]);
   
   const { toast } = useToast();
   const { handleFeedbackSubmit } = useFeedback();
@@ -49,7 +50,7 @@ export const useChat = () => {
     return currentMessageId.current;
   };
 
-  const generateResponse = async (userMessage: string) => {
+  const generateResponse = async (userMessage: string, files?: File[]) => {
     setIsAITyping(true);
     setErrorMessage(null);
     setApiKeyError(null);
@@ -67,7 +68,7 @@ export const useChat = () => {
         content: userMessage
       }];
       
-      const response = await generateGeminiResponse(fullMessageHistory);
+      const response = await generateGeminiResponse(fullMessageHistory, files);
       
       if (response.error) {
         console.error("Gemini API Error:", response.error);
@@ -111,17 +112,30 @@ export const useChat = () => {
       e.preventDefault();
     }
     
-    if (!inputMessage.trim() || isAITyping || isRateLimited) {
+    if ((!inputMessage.trim() && fileUploads.length === 0) || isAITyping || isRateLimited) {
       return;
     }
     
     const userMessage = inputMessage.trim();
     setInputMessage('');
     
+    // Create message text to include file information if present
+    let messageText = userMessage;
+    if (fileUploads.length > 0) {
+      const fileNames = fileUploads.map(file => file.name).join(", ");
+      const fileText = fileUploads.length === 1 
+        ? `[Attached file: ${fileNames}]` 
+        : `[Attached files: ${fileNames}]`;
+      
+      messageText = messageText 
+        ? `${messageText}\n\n${fileText}` 
+        : fileText;
+    }
+    
     // Add user message to chat
     const newUserMessage: Message = {
       id: getNextMessageId(),
-      text: userMessage,
+      text: messageText,
       sender: 'user',
       timestamp: new Date()
     };
@@ -129,8 +143,12 @@ export const useChat = () => {
     setMessages(prev => [...prev, newUserMessage]);
     scrollToBottom(true);
     
+    // Capture files and then clear them
+    const filesToProcess = [...fileUploads];
+    setFileUploads([]);
+    
     // Generate and add AI response
-    const aiResponse = await generateResponse(userMessage);
+    const aiResponse = await generateResponse(messageText, filesToProcess);
     
     if (aiResponse) {
       const newAIMessage: Message = {
@@ -174,6 +192,8 @@ export const useChat = () => {
     errorMessage,
     apiKeyError,
     hasScrolledUp,
+    fileUploads,
+    setFileUploads,
     chatContainerRef,
     messagesEndRef,
     handleSendMessage,

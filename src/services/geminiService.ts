@@ -5,7 +5,8 @@ import { GeminiErrorResponse, GeminiResponse } from '@/types/chat';
 const SERVER_API_KEY = "AIzaSyDYH3gyvcbAu1qwuF2TG1NV-IGBc_3W58w";
 
 export async function generateGeminiResponse(
-  messages: { role: string; content: string }[]
+  messages: { role: string; content: string }[],
+  files?: File[]
 ): Promise<GeminiResponse> {
   try {
     // Extract the user's current question (last message)
@@ -17,21 +18,13 @@ export async function generateGeminiResponse(
       .join('\n\n')
       .slice(-5000); // Limit context to avoid token limits
     
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": SERVER_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user", 
-              parts: [
-                { 
-                  text: `You are an expert financial advisor AI assistant specializing in Indian markets. Your role is to provide personalized, accurate financial guidance while following these key principles:
+    let requestBody: any = {
+      contents: [
+        {
+          role: "user", 
+          parts: [
+            { 
+              text: `You are an expert financial advisor AI assistant specializing in Indian markets. Your role is to provide personalized, accurate financial guidance while following these key principles:
 
 1. Always begin by understanding the user's situation:
 - Financial goals
@@ -84,35 +77,53 @@ Remember to:
 - Be transparent about risks
 - Ask follow-up questions to better understand the user's needs
 - Respond in the same language as the user's query when possible`
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 2048,
-          },
-          safetySettings: [
-            {
-              category: "HARM_CATEGORY_HARASSMENT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_HATE_SPEECH",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
             }
           ]
-        }),
+        }
+      ],
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 2048,
+      },
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_HARASSMENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_HATE_SPEECH",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        }
+      ]
+    };
+
+    // Handle file attachments if present
+    if (files && files.length > 0) {
+      // Note: This is a placeholder for future implementation
+      // Currently, the Gemini API doesn't directly support file uploading through this endpoint
+      // We would need to implement file processing or use a different endpoint/service
+      console.log("File attachments detected, but not supported yet:", files.map(f => f.name));
+    }
+
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": SERVER_API_KEY,
+        },
+        body: JSON.stringify(requestBody),
       }
     );
 

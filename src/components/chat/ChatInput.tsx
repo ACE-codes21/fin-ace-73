@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Loader2, Sparkles, Globe } from 'lucide-react';
+import { Send, Loader2, Sparkles, Upload } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -47,10 +47,29 @@ const ChatInput: React.FC<ChatInputProps> = ({
   handleKeyDown,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [fileUploads, setFileUploads] = useState<File[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   
   const handleQuickPromptSelect = (prompt: string) => {
     setInputMessage(prompt);
     setShowSuggestions(false);
+  };
+
+  const handleFileUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setFileUploads(prev => [...prev, ...Array.from(files)]);
+      // Reset the input to allow selecting the same file again
+      e.target.value = '';
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setFileUploads(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -60,6 +79,22 @@ const ChatInput: React.FC<ChatInputProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
+      {fileUploads.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2 px-3">
+          {fileUploads.map((file, index) => (
+            <div key={index} className="flex items-center gap-1 bg-gray-100 py-1 px-2 rounded-full text-xs">
+              <span className="truncate max-w-[180px]">{file.name}</span>
+              <button 
+                onClick={() => removeFile(index)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      
       <form onSubmit={handleSendMessage} className="relative">
         <div className="flex space-x-2">
           <Popover open={showSuggestions} onOpenChange={setShowSuggestions}>
@@ -68,7 +103,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 type="button" 
                 size="icon" 
                 variant="outline"
-                className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500 shadow-sm h-10 w-10 flex-shrink-0"
+                className="bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-500 shadow-sm h-10 w-10 flex-shrink-0"
               >
                 <motion.div
                   whileHover={{ rotate: 180 }}
@@ -106,16 +141,26 @@ const ChatInput: React.FC<ChatInputProps> = ({
                   type="button"
                   size="icon"
                   variant="outline"
-                  className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500 shadow-sm h-10 w-10 flex-shrink-0"
+                  className="bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-500 shadow-sm h-10 w-10 flex-shrink-0"
+                  onClick={handleFileUpload}
                 >
-                  <Globe className="h-4 w-4" />
+                  <Upload className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Chat in any language</p>
+                <p>Upload financial documents (PDF, Excel, Images)</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept=".pdf,.xls,.xlsx,.csv,.jpg,.jpeg,.png"
+            onChange={handleFileChange}
+            multiple
+          />
           
           <motion.div 
             className="flex-grow relative"
@@ -127,14 +172,14 @@ const ChatInput: React.FC<ChatInputProps> = ({
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="py-5 sm:py-6 pl-3 sm:pl-4 pr-10 sm:pr-12 rounded-full input-field shadow-sm hover:shadow-md transition-shadow bg-white/80 backdrop-blur-sm border-gray-200 text-sm sm:text-base"
+              className="py-5 sm:py-6 pl-3 sm:pl-4 pr-10 sm:pr-12 rounded-full input-field shadow-sm hover:shadow-md transition-shadow bg-gray-50/80 backdrop-blur-sm border-gray-200 text-sm sm:text-base"
               disabled={isAITyping || isRateLimited}
             />
             <Button 
               type="submit" 
               size="icon"
               className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-finance-primary hover:bg-finance-primary/90 transition-all duration-300 h-7 w-7 sm:h-8 sm:w-8"
-              disabled={isAITyping || isRateLimited || inputMessage.trim() === ''}
+              disabled={isAITyping || isRateLimited || (inputMessage.trim() === '' && fileUploads.length === 0)}
             >
               {isAITyping ? (
                 <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />

@@ -2,11 +2,9 @@
 import React, { useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, Bot } from 'lucide-react';
 import { FeedbackRating } from "@/components/chat/FeedbackRating";
 import { Message } from '@/types/chat';
 import { motion } from 'framer-motion';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ChatMessageProps {
   message: Message;
@@ -41,6 +39,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
     }
   }, []);
 
+  // Check if message contains file attachment info
+  const hasFileAttachment = message.text.includes('[Attached file');
+
   return (
     <motion.div
       ref={messageRef}
@@ -52,14 +53,27 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
     >
       <div className={`flex max-w-[90%] sm:max-w-[80%] md:max-w-[70%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
         <div
-          className={`p-3 md:p-4 rounded-2xl shadow-md ${
+          className={`p-3 md:p-4 rounded-2xl ${
             message.sender === 'user'
-              ? 'bg-gradient-to-br from-finance-primary to-finance-primary/80 text-white'
-              : 'bg-gradient-to-br from-white to-gray-50 text-gray-800 border border-gray-100'
+              ? 'bg-gradient-to-br from-finance-primary/90 to-finance-primary/70 text-white shadow-sm'
+              : 'bg-white text-gray-800 border border-gray-200 shadow-sm'
           }`}
         >
           {message.sender === 'user' ? (
-            <p style={{ whiteSpace: 'pre-wrap' }} className="text-sm md:text-base">{message.text}</p>
+            <div>
+              {hasFileAttachment ? (
+                <div>
+                  <p style={{ whiteSpace: 'pre-wrap' }} className="text-sm md:text-base">
+                    {message.text.split('\n\n[Attached file')[0]}
+                  </p>
+                  <div className="mt-2 p-2 bg-finance-primary/20 rounded-lg text-white/90 text-xs">
+                    {message.text.split('\n\n')[1]}
+                  </div>
+                </div>
+              ) : (
+                <p style={{ whiteSpace: 'pre-wrap' }} className="text-sm md:text-base">{message.text}</p>
+              )}
+            </div>
           ) : (
             <>
               <div className="prose prose-sm max-w-none dark:prose-invert text-sm md:text-base" dir="auto">

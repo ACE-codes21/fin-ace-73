@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 98%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -60,7 +60,7 @@
   }
   
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-gray-50 text-foreground font-sans antialiased;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -86,7 +86,7 @@
   }
   
   .glass-card {
-    @apply bg-white/90 backdrop-blur-md border border-white/40 shadow-soft;
+    @apply bg-white/80 backdrop-blur-md border border-white/40 shadow-soft;
   }
 
   .text-gradient {
@@ -152,7 +152,7 @@
 .chat-form-container {
   position: sticky;
   bottom: 0;
-  background: white;
+  background: linear-gradient(to top, rgba(249, 250, 251, 1) 80%, rgba(249, 250, 251, 0));
   padding: 1rem 0;
   z-index: 10;
 }

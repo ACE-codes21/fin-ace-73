@@ -6,7 +6,7 @@ import ChatInput from '@/components/chat/ChatInput';
 import { ChatError } from '@/components/chat/ChatError';
 import { useChat } from '@/hooks/useChat';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Globe } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import ErrorBoundary from '@/components/chat/ErrorBoundary';
 
 const Chat = () => {
@@ -17,6 +17,8 @@ const Chat = () => {
     isRateLimited,
     apiKeyError,
     hasScrolledUp,
+    fileUploads,
+    setFileUploads,
     handleSendMessage,
     setInputMessage,
     handleKeyDown,
@@ -28,7 +30,7 @@ const Chat = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-finance-primary to-finance-accent bg-clip-text text-transparent">
             FinAce AI Chat
@@ -54,14 +56,8 @@ const Chat = () => {
             <>
               <Alert variant="default" className="mb-4 bg-finance-primary/5 border border-finance-primary/20">
                 <Shield className="h-4 w-4 text-finance-primary" />
-                <AlertDescription className="flex items-center">
-                  <span className="flex-grow">
-                    Ask me anything about investing in the Indian market, financial planning, or managing your personal finances.
-                  </span>
-                  <span className="inline-flex items-center text-xs text-finance-primary/70 ml-2">
-                    <Globe className="h-3 w-3 mr-1" /> 
-                    <span>Multilingual support</span>
-                  </span>
+                <AlertDescription>
+                  Ask me anything about investing in the Indian market, financial planning, or managing your personal finances.
                 </AlertDescription>
               </Alert>
 
@@ -84,7 +80,7 @@ const Chat = () => {
               />
 
               {hasScrolledUp && messages.length > 3 && (
-                <div className="fixed bottom-24 right-1/2 transform translate-x-1/2 bg-finance-primary text-white px-4 py-2 rounded-full text-sm shadow-lg animate-bounce">
+                <div className="fixed bottom-24 right-1/2 transform translate-x-1/2 bg-gray-700 text-white px-4 py-2 rounded-full text-sm shadow-lg animate-bounce">
                   New messages below
                 </div>
               )}

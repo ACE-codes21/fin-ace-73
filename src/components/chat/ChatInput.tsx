@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Loader2, Sparkles } from 'lucide-react';
+import { Send, Loader2, Sparkles, Globe } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -32,6 +32,10 @@ const QUICK_PROMPTS = [
   "Tell me about SIP investments",
   "How to build an emergency fund?",
   "What are the tax benefits of ELSS funds?",
+  // Multilingual examples
+  "मुझे म्यूचुअल फंड के बारे में बताएं", // Hindi
+  "எனக்கு நிதி திட்டமிடல் பற்றி சொல்லுங்கள்", // Tamil
+  "స్టాక్ మార్కెట్లో ఎలా పెట్టుబడి పెట్టాలి?", // Telugu
 ];
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -94,6 +98,24 @@ const ChatInput: React.FC<ChatInputProps> = ({
               </div>
             </PopoverContent>
           </Popover>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  className="bg-white hover:bg-gray-50 border-gray-200 text-gray-500 shadow-sm h-10 w-10 flex-shrink-0"
+                >
+                  <Globe className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Chat in any language</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           
           <motion.div 
             className="flex-grow relative"

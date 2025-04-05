@@ -55,10 +55,10 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                 transition={{ duration: 0.5 }}
                 className="text-center p-4 sm:p-6 rounded-xl bg-gradient-to-br from-gray-50/70 to-gray-100/70 shadow-sm border border-gray-100 max-w-[95%] sm:max-w-md mx-auto"
               >
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Welcome to AI Chat</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Welcome to FinAce AI Chat</h3>
                 <p className="text-gray-600 text-sm sm:text-base">
                   Ask me questions about investing in the Indian market, financial planning, 
-                  or anything related to personal finance.
+                  or anything related to personal finance. I can help in multiple languages.
                 </p>
               </motion.div>
             </div>

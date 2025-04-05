@@ -6,7 +6,7 @@ import ChatInput from '@/components/chat/ChatInput';
 import { ChatError } from '@/components/chat/ChatError';
 import { useChat } from '@/hooks/useChat';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield } from 'lucide-react';
+import { Shield, Globe } from 'lucide-react';
 import ErrorBoundary from '@/components/chat/ErrorBoundary';
 
 const Chat = () => {
@@ -54,8 +54,14 @@ const Chat = () => {
             <>
               <Alert variant="default" className="mb-4 bg-finance-primary/5 border border-finance-primary/20">
                 <Shield className="h-4 w-4 text-finance-primary" />
-                <AlertDescription>
-                  Ask me anything about investing in the Indian market, financial planning, or managing your personal finances.
+                <AlertDescription className="flex items-center">
+                  <span className="flex-grow">
+                    Ask me anything about investing in the Indian market, financial planning, or managing your personal finances.
+                  </span>
+                  <span className="inline-flex items-center text-xs text-finance-primary/70 ml-2">
+                    <Globe className="h-3 w-3 mr-1" /> 
+                    <span>Multilingual support</span>
+                  </span>
                 </AlertDescription>
               </Alert>
 

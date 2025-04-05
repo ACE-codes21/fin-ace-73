@@ -67,6 +67,12 @@ export async function generateGeminiResponse(
 - Tax implications
 - Market conditions
 
+7. Language support:
+- Detect the language of the user's input
+- Respond in the same language as the user
+- If you're unsure about the language, respond in English
+- Support multiple Indian languages including Hindi, Tamil, Telugu, Kannada, Malayalam, Bengali, Marathi, and Gujarati
+
 Previous conversation context:
 ${chatContext}
 
@@ -76,7 +82,8 @@ Remember to:
 - Give personalized advice based on the user's situation
 - Explain concepts simply
 - Be transparent about risks
-- Ask follow-up questions to better understand the user's needs`
+- Ask follow-up questions to better understand the user's needs
+- Respond in the same language as the user's query when possible`
                 }
               ]
             }

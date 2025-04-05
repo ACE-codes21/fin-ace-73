@@ -62,7 +62,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, onFeedbackSubmit }) 
             <p style={{ whiteSpace: 'pre-wrap' }} className="text-sm md:text-base">{message.text}</p>
           ) : (
             <>
-              <div className="prose prose-sm max-w-none dark:prose-invert text-sm md:text-base">
+              <div className="prose prose-sm max-w-none dark:prose-invert text-sm md:text-base" dir="auto">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {message.text}
                 </ReactMarkdown>

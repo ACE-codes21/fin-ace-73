@@ -13,7 +13,7 @@ export const useChat = () => {
   
   const { messages, addUserMessage, addAIMessage, updateMessageWithFeedback } = useMessages();
   const { isAITyping, isRateLimited, errorMessage, apiKeyError, generateResponse } = useAIResponse();
-  const { fileUploads, addFiles: setFileUploads, clearFiles, removeFile } = useFileUploads();
+  const { fileUploads, addFiles, clearFiles, removeFile } = useFileUploads();
   const { handleFeedbackSubmit } = useFeedback();
   
   const { 

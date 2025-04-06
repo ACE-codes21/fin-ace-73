@@ -1,25 +1,15 @@
 
-import { Message } from "@/types/chat";
-
-export interface FileInfo {
-  id: string;
-  name: string;
-  type: string;
-  size: number;
-  content: string | ArrayBuffer;
-}
+import { FileInfo } from "@/types/chat";
 
 export class DocumentService {
   // Process uploaded files and prepare them for the AI
   static async processFiles(files: File[]): Promise<FileInfo[]> {
     const filePromises = Array.from(files).map(async (file) => {
-      const fileInfo: FileInfo = {
+      const fileInfo = {
+        ...file,
         id: crypto.randomUUID(),
-        name: file.name,
-        type: file.type,
-        size: file.size,
         content: ""
-      };
+      } as FileInfo;
 
       // Read file content based on file type
       if (file.type.includes("text") || 

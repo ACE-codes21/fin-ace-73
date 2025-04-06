@@ -24,3 +24,8 @@ export interface GeminiResponse {
   text?: string;
   error?: GeminiErrorResponse;
 }
+
+export interface FileInfo extends File {
+  id: string;
+  content: string | ArrayBuffer;
+}

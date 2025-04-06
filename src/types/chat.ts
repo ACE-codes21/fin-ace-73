@@ -19,3 +19,8 @@ export interface GeminiErrorResponse {
   message: string;
   status: string;
 }
+
+export interface GeminiResponse {
+  text?: string;
+  error?: GeminiErrorResponse;
+}

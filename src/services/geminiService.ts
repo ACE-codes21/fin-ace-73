@@ -12,11 +12,11 @@ export async function generateGeminiResponse(
     // Extract the user's current question (last message)
     const userQuestion = messages.filter(msg => msg.role === 'user').pop()?.content || '';
     
-    // Include chat history context for better continuity
+    // Include minimal chat history context for better continuity
     const chatContext = messages
+      .slice(-4) // Use just the last few messages for context
       .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
-      .join('\n\n')
-      .slice(-5000); // Limit context to avoid token limits
+      .join('\n\n');
     
     let requestBody: any = {
       contents: [
@@ -24,59 +24,26 @@ export async function generateGeminiResponse(
           role: "user", 
           parts: [
             { 
-              text: `You are an expert financial advisor AI assistant specializing in Indian markets. Your role is to provide personalized, accurate financial guidance while following these key principles:
+              text: `You are a concise financial advisor AI assistant specializing in Indian markets. Provide brief, practical financial guidance following these principles:
 
-1. Always begin by understanding the user's situation:
-- Financial goals
-- Risk tolerance
-- Current finances
-- Time horizon
-- Specific concerns
+1. Be concise - keep responses short and to the point.
+2. Focus on actionable advice rather than theory.
+3. Use simple language that non-experts can understand.
+4. Structure responses with bullet points when appropriate.
+5. Be direct and straightforward with your recommendations.
+6. Always consider Indian market context and regulations.
+7. Respond in the same language as the user's query.
 
-2. Provide clear, jargon-free explanations:
-- Use simple language
-- Be transparent about risks and rewards
-- Offer alternatives when appropriate
-
-3. Structure responses clearly:
-- Start with a brief overview
-- Follow with detailed reasoning
-- End with key takeaways
-
-4. Focus on:
-- Investment guidance
-- Retirement planning
-- Tax optimization
-- Risk management
-
-5. Maintain a professional yet approachable tone:
-- Be empathetic and supportive
-- Encourage learning
-- Ask relevant follow-up questions
-
-6. Always consider Indian market context:
-- Local regulations
-- Available investment options
-- Tax implications
-- Market conditions
-
-7. Language support:
-- Detect the language of the user's input
-- Respond in the same language as the user
-- If you're unsure about the language, respond in English
-- Support multiple Indian languages including Hindi, Tamil, Telugu, Kannada, Malayalam, Bengali, Marathi, and Gujarati
-
-Previous conversation context:
+Previous conversation:
 ${chatContext}
 
 Current question: ${userQuestion}
 
-Remember to:
-- Give personalized advice based on the user's situation
-- Explain concepts simply
-- Be transparent about risks
-- Ask follow-up questions to better understand the user's needs
-- Respond in the same language as the user's query when possible`
+Remember:
+- Give only essential information
+- Focus on practical steps
+- Be concise and direct
+- Use the same language as the user's query`
             }
           ]
         }
@@ -85,7 +52,7 @@ Remember to:
         temperature: 0.7,
         topK: 40,
         topP: 0.95,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 1024, // Reduced for more concise responses
       },
       safetySettings: [
         {
@@ -109,10 +76,12 @@ Remember to:
 
     // Handle file attachments if present
     if (files && files.length > 0) {
-      // Note: This is a placeholder for future implementation
-      // Currently, the Gemini API doesn't directly support file uploading through this endpoint
-      // We would need to implement file processing or use a different endpoint/service
-      console.log("File attachments detected, but not supported yet:", files.map(f => f.name));
+      // Process document content to include in the prompt
+      const formattedFiles = await formatFilesForPrompt(files);
+      if (formattedFiles) {
+        // Add file content to the prompt
+        requestBody.contents[0].parts[0].text += `\n\nAnalyze the following documents:\n${formattedFiles}`;
+      }
     }
 
     const response = await fetch(
@@ -165,6 +134,17 @@ Remember to:
         status: 500,
       },
     };
+  }
+}
+
+async function formatFilesForPrompt(files: File[]): Promise<string | null> {
+  try {
+    // Use the DocumentService to extract text content
+    const processedFiles = await DocumentService.processFiles(files);
+    return DocumentService.formatFileContentForAI(processedFiles);
+  } catch (error) {
+    console.error("Error processing files for prompt:", error);
+    return null;
   }
 }
 

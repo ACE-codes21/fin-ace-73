@@ -137,7 +137,8 @@ export const useChat = () => {
       id: getNextMessageId(),
       text: messageText,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      feedbackSubmitted: false
     };
     
     setMessages(prev => [...prev, newUserMessage]);
@@ -155,7 +156,8 @@ export const useChat = () => {
         id: getNextMessageId(),
         text: aiResponse,
         sender: 'ai',
-        timestamp: new Date()
+        timestamp: new Date(),
+        feedbackSubmitted: false
       };
       
       setMessages(prev => [...prev, newAIMessage]);

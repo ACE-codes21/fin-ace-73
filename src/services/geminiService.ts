@@ -1,3 +1,4 @@
+
 import { GeminiErrorResponse, GeminiResponse } from '@/types/chat';
 import { DocumentService, FileInfo } from '@/services/DocumentService';
 
@@ -24,15 +25,16 @@ export async function generateGeminiResponse(
           role: "user", 
           parts: [
             { 
-              text: `You are a concise financial advisor AI assistant specializing in Indian markets. Provide brief, practical financial guidance following these principles:
+              text: `You are a financial advisor AI assistant specializing in Indian markets. Provide balanced, practical financial guidance following these principles:
 
-1. Be concise - keep responses short and to the point.
-2. Focus on actionable advice rather than theory.
-3. Use simple language that non-experts can understand.
-4. Structure responses with bullet points when appropriate.
-5. Be direct and straightforward with your recommendations.
-6. Always consider Indian market context and regulations.
-7. Respond in the same language as the user's query.
+1. Give complete and well-rounded responses - not too short, not too long.
+2. Provide enough detail to fully address the question without being overwhelming.
+3. Include context and explanation where helpful to understanding.
+4. Use clear structure with paragraphs and bullet points when appropriate.
+5. Focus on actionable advice rather than theory.
+6. Use simple language that non-experts can understand.
+7. Consider Indian market context and regulations in your answers.
+8. Respond in the same language as the user's query.
 
 Previous conversation:
 ${chatContext}
@@ -40,19 +42,19 @@ ${chatContext}
 Current question: ${userQuestion}
 
 Remember:
-- Give only essential information
-- Focus on practical steps
-- Be concise and direct
+- Provide comprehensive but focused answers
+- Balance detail with clarity
+- Be practical and user-friendly
 - Use the same language as the user's query`
             }
           ]
         }
       ],
       generationConfig: {
-        temperature: 0.7,
+        temperature: 0.75,
         topK: 40,
         topP: 0.95,
-        maxOutputTokens: 1024, // Reduced for more concise responses
+        maxOutputTokens: 2048, // Increased to allow for more complete responses
       },
       safetySettings: [
         {
@@ -151,3 +153,4 @@ async function formatFilesForPrompt(files: File[]): Promise<string | null> {
 export function isGeminiError(error: any): error is GeminiErrorResponse {
   return error && typeof error === "object" && "error" in error && error.error === true;
 }
+

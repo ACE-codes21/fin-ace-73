@@ -8,7 +8,6 @@ import ErrorBoundary from '@/components/chat/ErrorBoundary';
 import { Message, GeminiErrorResponse } from '@/types/chat';
 import Layout from '@/components/layout/Layout';
 import Chat3DBackground from '@/components/effects/Chat3DBackground';
-import { DocumentService, FileInfo } from '@/services/DocumentService';
 import { useChat } from '@/hooks/useChat';
 
 const Chat = () => {

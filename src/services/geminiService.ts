@@ -1,5 +1,6 @@
 
 import { GeminiErrorResponse, GeminiResponse } from '@/types/chat';
+import { DocumentService } from '@/services/DocumentService';
 
 // Server-side API key for production use
 const SERVER_API_KEY = "AIzaSyDYH3gyvcbAu1qwuF2TG1NV-IGBc_3W58w";
@@ -100,9 +101,9 @@ Remember:
       const errorData = await response.json();
       return {
         error: {
-          error: true,
+          code: errorData.error?.code || 500,
           message: errorData.error?.message || "Error calling Gemini API",
-          status: response.status,
+          status: errorData.error?.status || "ERROR",
         },
       };
     }
@@ -112,9 +113,9 @@ Remember:
     if (data.error) {
       return {
         error: {
-          error: true,
+          code: data.error.code || 500,
           message: data.error.message || "Error from Gemini API",
-          status: 500,
+          status: data.error.status || "ERROR",
         },
       };
     }
@@ -129,9 +130,9 @@ Remember:
     console.error("Error calling Gemini API:", error);
     return {
       error: {
-        error: true,
+        code: 500,
         message: error instanceof Error ? error.message : "Unknown error calling Gemini API",
-        status: 500,
+        status: "ERROR",
       },
     };
   }

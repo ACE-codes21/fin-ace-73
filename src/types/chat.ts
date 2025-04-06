@@ -1,19 +1,21 @@
 
 export interface Message {
   id: number;
-  text: string;
   sender: 'user' | 'ai';
+  text: string;
   timestamp: Date;
-  feedbackSubmitted?: boolean;
+  feedbackSubmitted: boolean;
+}
+
+export interface MessageFeedback {
+  messageId: number;
+  rating: number;
+  feedback: string;
+  timestamp: Date;
 }
 
 export interface GeminiErrorResponse {
-  error: boolean;
+  code: number;
   message: string;
-  status?: number;
-}
-
-export interface GeminiResponse {
-  text?: string;
-  error?: GeminiErrorResponse;
+  status: string;
 }

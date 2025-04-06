@@ -6,7 +6,7 @@ interface ChatUploadHandlerProps {
   setFileUploads: (files: File[]) => void;
 }
 
-const ChatUploadHandler: React.FC<ChatUploadHandlerProps> = ({ setFileUploads }) => {
+const ChatUploadHandler = ({ setFileUploads }: ChatUploadHandlerProps) => {
   const { toast } = useToast();
 
   const handleFileUpload = async (files: File[]) => {

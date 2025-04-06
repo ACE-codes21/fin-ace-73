@@ -29,7 +29,8 @@ const ChatContent = () => {
   };
 
   const removeFile = (index: number) => {
-    setFileUploads(prev => prev.filter((_, i) => i !== index));
+    const updatedFiles = fileUploads.filter((_, i) => i !== index);
+    setFileUploads(updatedFiles);
   };
 
   return (

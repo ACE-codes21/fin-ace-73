@@ -1,5 +1,8 @@
 
-import { FileInfo } from "@/types/chat";
+export interface FileInfo extends File {
+  id: string;
+  content: string | ArrayBuffer;
+}
 
 export class DocumentService {
   // Process uploaded files and prepare them for the AI

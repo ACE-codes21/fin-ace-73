@@ -9,7 +9,7 @@ interface ChatUploadHandlerProps {
 const ChatUploadHandler = ({ setFileUploads }: ChatUploadHandlerProps) => {
   const { toast } = useToast();
 
-  const handleFileUpload = async (files: File[]) => {
+  const handleFileUpload = (files: File[]) => {
     if (!files || files.length === 0) return;
     
     try {

@@ -1,6 +1,5 @@
-
 import { GeminiErrorResponse, GeminiResponse } from '@/types/chat';
-import { DocumentService } from '@/services/DocumentService';
+import { DocumentService, FileInfo } from '@/services/DocumentService';
 
 // Server-side API key for production use
 const SERVER_API_KEY = "AIzaSyDYH3gyvcbAu1qwuF2TG1NV-IGBc_3W58w";
